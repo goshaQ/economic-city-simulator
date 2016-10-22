@@ -3,8 +3,7 @@ package com.itproject.game.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
-import com.itproject.game.EconomicCitySimulator;
-import com.itproject.game.OrthographicCameraController;
+import com.itproject.game.City;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
@@ -12,6 +11,7 @@ public class DesktopLauncher {
 		config.title = "Drop";
 		config.width = 800;
 		config.height = 480;
-		new LwjglApplication(new OrthographicCameraController(), config);
+		config.initialBackgroundColor = Color.WHITE;
+		//new LwjglApplication(new City(), config);
 	}
 }
