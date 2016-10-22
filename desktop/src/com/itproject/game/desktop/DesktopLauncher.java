@@ -12,6 +12,6 @@ public class DesktopLauncher {
 		config.width = 800;
 		config.height = 480;
 		config.initialBackgroundColor = Color.WHITE;
-		//new LwjglApplication(new City(), config);
+		new LwjglApplication(new City(), config);
 	}
 }
