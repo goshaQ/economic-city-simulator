@@ -1,0 +1,116 @@
+package com.itproject.game.buildings;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.badlogic.gdx.math.Polygon;
+import com.itproject.game.Assets;
+import com.itproject.game.Citizen;
+
+public class House extends Building {
+	
+	public static final int TILE_HEIGHT = 32;
+	public static final int TILE_WIDTH = 64;	
+	public static final int HOUSE_OK = 0;
+	public static final int HOUSE_ON_FIRE = 1;
+	public static final int HOUSE_SELECTED = 2;
+	public static final int HOUSE_UNSELECTED = 3;
+	public static final int HOUSE_DESTROYED = 4;
+	
+	
+	int state;
+	private int col, row;
+	private Polygon shape;
+	private Polygon collisionShape;
+	
+	List<Citizen> residents;
+	TiledMapTileLayer.Cell cell;
+	TiledMapTileLayer layer;
+	
+	public House(int row, int col) {
+		super(1000, 100);
+		this.col = col;
+		this.row = row;
+		
+		cost = 5000;
+		serviceCost = 300;
+		residents = new ArrayList<Citizen>();
+		cell = new TiledMapTileLayer.Cell();
+		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
+	}
+	
+	public void update() {
+		updateSelected();
+	}
+	
+
+	public void updateSelected() {
+		if(state == HOUSE_SELECTED) {
+			cell = layer.getCell(row, col);
+			cell.setTile(new StaticTiledMapTile(Assets.selectedDemoBlock));
+
+		} else if(state == HOUSE_UNSELECTED){
+			cell.setTile(new StaticTiledMapTile(Assets.demoBlock));
+			state = HOUSE_OK;
+		}
+	}
+	
+	
+	public void createShape(int row, int col) {
+		this.col = col; 
+		this.row = row;
+		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
+	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
+	    float[] vertices = new float[12];
+	    vertices[0] = screenx;   vertices[1] = screeny;
+	    vertices[2] = screenx + 32; vertices[3] = screeny - 16;
+	    vertices[4] = screenx + 64; vertices[5] = screeny;
+	    vertices[6] = screenx + 64; vertices[7] = screeny + 64;
+	    vertices[8] = screenx + 32; vertices[9] = screeny - 16 + 64;
+	    vertices[10] = screenx; vertices[11] = screeny + 64;
+		shape = new Polygon(vertices);
+	}
+
+	public void createCollisionShape(int row, int col) {
+		this.col = col; 
+		this.row = row;
+		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
+	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
+	    float[] vertices = new float[8];
+	    vertices[0] = screenx;   vertices[1] = screeny;
+	    vertices[2] = screenx + 32; vertices[3] = screeny - 16;
+	    vertices[4] = screenx + 64; vertices[5] = screeny;
+	    vertices[6] = screenx + 32; vertices[7] = screeny + 16;
+	}
+	
+	public Polygon getCollisionShape() {
+		return collisionShape;
+	}
+	
+	public Polygon getShape() {
+		return shape;
+	}
+
+	
+	public int getCol() {
+		return col;
+	}
+
+	
+	public int getRow() {
+		return row;
+	}
+
+	
+	public void showInfo() {
+		System.out.println("It is a house!");
+	}
+
+	
+	public void setState(int state) {
+		this.state = state;
+	}
+
+}
