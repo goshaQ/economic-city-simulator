@@ -8,8 +8,8 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Economic City Simulator";
-		config.width =  1920;
-		config.height = 1080;
+		config.width =  1366;
+		config.height = 768;
 		new LwjglApplication(new EconomicCitySimulator(), config);
 	}
 }
