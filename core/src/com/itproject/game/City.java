@@ -3,6 +3,8 @@ package com.itproject.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.itproject.game.buildings.Building;
+
 public class City {
 	public interface CityListener {
 		// To do
@@ -14,6 +16,9 @@ public class City {
 	public static final int CITY_STATE_RUNNING = 0;
 	public static final int CITY_STATE_GAME_OVER = 1;
 	
+	private float gameTime;
+	public static Time time;
+	
 	CityListener listener;
 	List<Citizen> citizens;
 	List<Building> buildings;
@@ -23,8 +28,10 @@ public class City {
 	long cityBudget; // long long
 	
 	public City(CityListener listener) {
+		time = new Time();
+		
 		this.citizens = new ArrayList<Citizen>();
-		this.buildings = new ArrayList<Building>();
+		this.buildings = new ArrayList<Building>(); // Building
 		this.road = new ArrayList<Road>();
 		this.listener = listener;
 		
@@ -39,13 +46,35 @@ public class City {
 	}*/
 	
 	public void update(float deltaTime) {
+		gameTime += deltaTime;
 		//updateCitizens(deltaTime);
 		//updateBuildings(deltaTime);
 		//updateRoad(deltaTime);
+		if(gameTime >= 1f) {
+			updateTime();
+			gameTime -= 1f;
+		}
+		
+		updateBuildings();
 		checkGameOver();
 	}
 	
+	public void updateTime() {
+		time.nextDay();
+		System.out.println(City.time.toString());	
+	}
+	
+	public void updateBuildings() {
+		for(Building station : buildings) {
+			station.update();
+		}
+	}	
+	
 	private void checkGameOver() {
 		
+	}
+	
+	public List<Building> getBuildingList() {
+		return buildings;
 	}
 }

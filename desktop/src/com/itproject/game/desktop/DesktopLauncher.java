@@ -10,6 +10,8 @@ public class DesktopLauncher {
 		config.title = "Economic City Simulator";
 		config.width =  1920;
 		config.height = 1080;
+		//set fullscreen after creating exit button
+		//config.fullscreen = true;
 		new LwjglApplication(new EconomicCitySimulator(), config);
 	}
 }
