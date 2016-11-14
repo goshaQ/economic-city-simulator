@@ -18,6 +18,7 @@ public class City {
 	
 	private float gameTime;
 	public static Time time;
+	public int globalTime;
 	
 	CityListener listener;
 	List<Citizen> citizens;
@@ -61,7 +62,7 @@ public class City {
 	
 	public void updateTime() {
 		time.nextDay();
-		System.out.println(City.time.toString());	
+	//	System.out.println(City.time.toString());	
 	}
 	
 	public void updateBuildings() {

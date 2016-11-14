@@ -11,7 +11,7 @@ public class EconomicCitySimulator extends Game {
 	public void create() {
 		batcher = new SpriteBatch();
 		Assets.load();
-		setScreen(new GameScreen(this));
+		setScreen(new MainMenuScreen(this));
 	}
 	
 	@Override

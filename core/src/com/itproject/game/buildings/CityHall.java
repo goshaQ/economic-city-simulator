@@ -17,8 +17,11 @@ public class CityHall extends Building {
 	public static final int CITYHALL_SELECTED = 2;
 	public static final int CITYHALL_UNSELECTED = 3;
 	public static final int CITYHALL_DESTROYED = 4;
+	public static final int CITYHALL_HEIGHT = 3;
+	public static final int CITYHALL_WIDTH = 3;
 	
 	TiledMapTileLayer.Cell[] cell;
+	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
@@ -69,7 +72,7 @@ public class CityHall extends Building {
 		}*/
 	}
 	
-	public void createShape(int row, int col) {
+	public void createShape() {
 		this.col = col; 
 		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
@@ -104,13 +107,13 @@ public class CityHall extends Building {
 		return row;
 	}
 	
-	public void showInfo() {
+	public void showInfo(float screenX, float screenY) {
 		// to implement
 		System.out.println("It is a CityHall!!");
 	}
 
 	@Override
-	public void createCollisionShape(int row, int col) {
+	public void createCollisionShape() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -119,6 +122,46 @@ public class CityHall extends Building {
 	public Polygon getCollisionShape() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int getZIndex() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setZIndex(int zIndex) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getPeopleSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean isPowered() {
+		return isPowered;
+	}
+
+	@Override
+	public void setPowered(boolean isPowered) {
+		this.isPowered = isPowered;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return CITYHALL_HEIGHT;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return CITYHALL_WIDTH;
 	}
 	
 	
