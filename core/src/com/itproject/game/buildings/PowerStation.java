@@ -53,7 +53,17 @@ public class PowerStation extends Building{
 	public void update() {
 		updateSelected();
 	}
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		//not used for power station
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		//not used for power station
+	}
+
 	public void updateSelected() {
 		/*if(state == POWER_STATION_SELECTED) {
 			cell[0] = layer.getCell(row, col);
@@ -153,7 +163,7 @@ public class PowerStation extends Building{
 	}
 
 	public void initializePowerConsumers() {
-		for(Building building : GameScreen.city.getBuildingList()) {
+		for(Building building : City.buildings) {
 			if(((building.getCol() >= this.col - POWER_RADIUS && building.getCol() <= this.col + POWER_RADIUS + this.getHeight() - 1 && building.getRow() >= this.row - POWER_RADIUS && building.getRow() <= this.row + POWER_RADIUS + this.getWidth() - 1)
 			   || (building.getCol() + building.getHeight() - 1 >= this.col - POWER_RADIUS && building.getCol() + building.getHeight() - 1 <= this.col + POWER_RADIUS + this.getHeight() - 1
 			   && building.getRow() + building.getWidth() - 1 >= this.row - POWER_RADIUS && building.getRow() + building.getWidth() - 1 <= this.row + POWER_RADIUS + this.getWidth() - 1 ))

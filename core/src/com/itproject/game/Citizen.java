@@ -52,7 +52,7 @@ public class Citizen {
             daysWithoutUpdate -= week.getDay();
 
             // check whether is ready to spend money
-            if (City.time.getDay() <= week.getDay()) {
+            /*if (City.time.getDay() <= week.getDay()) {
                 if (!((monthlyExpenses = house.payUtility(this)) > 0)) {
                     house.moveOut(this);
                 }
@@ -97,7 +97,7 @@ public class Citizen {
                     //TODO became a homeless
                     monthlyExpenses = 0;
                 }
-            }
+            }*/
 
             // check whether is ready to procreate
             Interval interval = age.subtractInterval(ageOfLastProcreation);

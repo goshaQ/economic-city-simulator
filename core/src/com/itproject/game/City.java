@@ -102,7 +102,7 @@ public class City {
 
 			Node node;
 
-			float[][] statistics = new float[3][];
+			float[][] statistics = new float[4][];
 			statistics[0] = birthStatistics;
 			statistics[1] = procreateStatistics;
 			statistics[2] = deathStatistics;

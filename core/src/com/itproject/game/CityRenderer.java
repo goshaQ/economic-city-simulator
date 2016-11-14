@@ -8,12 +8,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector3;
 import com.itproject.game.buildings.Bank;
@@ -70,7 +66,7 @@ public class CityRenderer {
 				}
 			}	
 			
-			for(Building building : city.getBuildingList()) {
+			for(Building building : City.buildings) {
 				if(building instanceof PowerStation) {
 					if(((col >= building.getCol() - PowerStation.POWER_RADIUS && col <= building.getCol() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_HEIGHT - 1 && row >= building.getRow() - PowerStation.POWER_RADIUS && row <= building.getRow() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_HEIGHT - 1)
 					   || (col + newBuilding.getWidth() - 1 >= building.getCol() - PowerStation.POWER_RADIUS && col + newBuilding.getWidth() - 1 <= building.getCol() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_WIDTH - 1&& row + newBuilding.getWidth() - 1 >= building.getRow() - PowerStation.POWER_RADIUS && row + newBuilding.getWidth() - 1 <= building.getRow() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_WIDTH - 1)) 

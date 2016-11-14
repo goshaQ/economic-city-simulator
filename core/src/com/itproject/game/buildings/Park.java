@@ -42,7 +42,17 @@ public class Park extends Building {
 	public void update() {
 		updateSelected();
 	}
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		//not used for park
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		//not used for park
+	}
+
 	public void updateSelected() {
 		/*if(state == PARK_SELECTED) {
 			cell[0] = layer.getCell(row, col);
