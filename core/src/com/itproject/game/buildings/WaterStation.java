@@ -18,8 +18,11 @@ public class WaterStation extends Building {
 	public static final int WATER_STATION_SELECTED = 2;
 	public static final int WATER_STATION_UNSELECTED = 3;
 	public static final int WATER_STATION_DESTROYED = 4;
-	
+	public static final int WATER_STATION_HEIGHT = 1;
+	public static final int WATER_STATION_WIDTH = 1;
+
 	TiledMapTileLayer.Cell[] cell;
+	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
@@ -80,7 +83,7 @@ public class WaterStation extends Building {
 		}*/
 	}
 	
-	public void createShape(int row, int col) {
+	public void createShape() {
 		this.col = col; 
 		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
@@ -115,13 +118,13 @@ public class WaterStation extends Building {
 		return row;
 	}
 	
-	public void showInfo() {
+	public void showInfo(float screenX, float screenY) {
 		// to implement
 		System.out.println("It is a Power Station!!");
 	}
 
 	@Override
-	public void createCollisionShape(int row, int col) {
+	public void createCollisionShape() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -131,6 +134,48 @@ public class WaterStation extends Building {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public int getZIndex() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setZIndex(int zIndex) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public int getPeopleSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean isPowered() {
+		return isPowered;
+	}
+
+	@Override
+	public void setPowered(boolean isPowered) {
+		this.isPowered = isPowered;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return WATER_STATION_HEIGHT;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return WATER_STATION_WIDTH;
+	}
+
+	
 
 	final byte buildingsLimit = 8;
 	final byte employeeLimitForBlock = 4;

@@ -16,10 +16,10 @@ public class City {
 	public interface CityListener {
 		// To do
 	}
-
+	
 	public static final float CITY_WIDTH = 10; // to change
 	public static final float CITY_HEIGHT = 15 * 20; // to change
-
+	
 	public static final int CITY_STATE_RUNNING = 0;
 	public static final int CITY_STATE_GAME_OVER = 1;
 
@@ -70,27 +70,25 @@ public class City {
 			citizens.add(new Citizen(worldview.determineType(), new Interval((byte) 0, (byte)0, (byte)18), (short) 3600));
 		}
 	}
-
+	
 	/*private void generateMap() {
-
+		
 	}*/
-
+	
 	public void update(float deltaTime) {
 		gameTime += deltaTime;
 		if (gameTime >= 1/200f) {
 			time.nextDay();
 
-			updateBuildings();
-			updateCitizens();
+            updateCitizens();
 			updatePopulation();
-			checkGameOver();
+            updateTime();
 
-			gameTime -= 1/200f;
+            gameTime -= 1/200f;
 		}
 
-		//
-		//updateBuildings(deltaTime);
-		//updateRoad(deltaTime);
+        updateBuildings();
+        checkGameOver();
 	}
 
 	public void loadStatistics() {
@@ -239,8 +237,23 @@ public class City {
 		}
 
 		citizens.removeAll(deadCitizens);
+		//updateCitizens(deltaTime);
+		//updateBuildings(deltaTime);
+		//updateRoad(deltaTime);
+		if(gameTime >= 1f) {
+			updateTime();
+			gameTime -= 1f;
+		}
+
+		updateBuildings();
+		checkGameOver();
 	}
 
+	public void updateTime() {
+		time.nextDay();
+	//	System.out.println(City.time.toString());
+	}
+	
 	public void updateBuildings() {
 		buildings.forEach(Building::update);
 	}

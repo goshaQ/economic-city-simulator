@@ -18,8 +18,12 @@ public class Hospital extends Building{
 	public static final int HOSPITAL_SELECTED = 2;
 	public static final int HOSPITAL_UNSELECTED = 3;
 	public static final int HOSPITAL_DESTROYED = 4;
-	
+	public static final int HOSPITAL_HEIGHT = 3;
+	public static final int HOSPITAL_WIDTH = 2;
+
+
 	TiledMapTileLayer.Cell[] cell;
+	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
@@ -41,7 +45,7 @@ public class Hospital extends Building{
 	public void update() {
 		updateSelected();
 	}
-
+	
 	public void updateSelected() {
 		/*if(state == HOSPITAL_SELECTED) {
 			cell[0] = layer.getCell(row, col);
@@ -70,7 +74,7 @@ public class Hospital extends Building{
 		}*/
 	}
 	
-	public void createShape(int row, int col) {
+	public void createShape() {
 		this.col = col; 
 		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
@@ -105,13 +109,13 @@ public class Hospital extends Building{
 		return row;
 	}
 	
-	public void showInfo() {
+	public void showInfo(float screenX, float screenY) {
 		// to implement
 		System.out.println("It is a Hospital!!");
 	}
 
 	@Override
-	public void createCollisionShape(int row, int col) {
+	public void createCollisionShape() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -121,6 +125,48 @@ public class Hospital extends Building{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public int getZIndex() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setZIndex(int zIndex) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public int getPeopleSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean isPowered() {
+		return isPowered;
+	}
+
+	@Override
+	public void setPowered(boolean isPowered) {
+		this.isPowered = isPowered;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return HOSPITAL_HEIGHT;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return HOSPITAL_WIDTH;
+	}
+
+	
 
 	@Override
 	public void setElectricityBill(short electricityBill) {

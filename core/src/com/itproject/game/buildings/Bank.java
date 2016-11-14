@@ -20,7 +20,12 @@ public class Bank extends Building{
 	public static final int BANK_SELECTED = 2;
 	public static final int BANK_UNSELECTED = 3;
 	public static final int BANK_DESTROYED = 4;
-	
+	public static final int BANK_HEIGHT = 2;
+	public static final int BANK_WIDTH = 2;
+
+
+	boolean isPowered;
+
 	TiledMapTileLayer.Cell[] cell;
 	int state;
 	private int col, row;
@@ -39,7 +44,7 @@ public class Bank extends Building{
 		cell = new TiledMapTileLayer.Cell[6];
 		bankers = new ArrayList<Citizen>(10); // default 10 firefighters at start
 		clerks = new ArrayList<Citizen>(10);
-		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
+		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
 	public void sendCrew() {
@@ -61,45 +66,35 @@ public class Bank extends Building{
 	}
 
 	public void updateSelected() {
-		/*if(state == BANK_SELECTED) {
-			cell[0] = layer.getCell(row, col);
-			cell[1] = layer.getCell(row + 1, col);
-			cell[2] = layer.getCell(row, col + 1);
-			cell[3] = layer.getCell(row + 1, col + 1);
-			cell[4] = layer.getCell(row, col + 2);
-			cell[5] = layer.getCell(row + 1, col + 2);
-			
-			cell[0].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));
+		if(state == BANK_SELECTED) {
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.bankSelectedCell3));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.bankSelectedCell4));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.bankSelectedCell1));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.bankSelectedCell2));
 		} else if(state == BANK_UNSELECTED) {
-	
-			cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.fireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.fireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.fireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.fireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));
-			
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.bankCell3));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.bankCell4));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.bankCell1));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.bankCell2));
 			state = BANK_OK;
-		}*/
+		}
 	}
 	
-	public void createShape(int row, int col) {
-		this.col = col; 
-		this.row = row;
+	public void createShape() {
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
-	    float[] vertices = new float[12];
+	    float[] vertices = new float[22];
 	    vertices[0] = screenx;   vertices[1] = screeny;
 	    vertices[2] = screenx + 64; vertices[3] = screeny - 32;
 	    vertices[4] = screenx + 128; vertices[5] = screeny;
-	    vertices[6] = screenx + 128; vertices[7] = screeny + 32;
-	    vertices[8] = screenx + 64; vertices[9] = screeny - 32 + 128;
-	    vertices[10] = screenx; vertices[11] = screeny + 64;
+	    vertices[6] = screenx + 128 - 13; vertices[7] = screeny + 6;
+	    vertices[8] = screenx + 128 - 13; vertices[9] = screeny + 6 + 40;
+	    vertices[10] = screenx + 128 - 7; vertices[11] = screeny + 49;
+	    vertices[12] = screenx + 65; vertices[13] = screeny + 79;
+	    vertices[14] = screenx + 31; vertices[15] = screeny + 79;
+	    vertices[16] = screenx; vertices[17] = screeny + 47;
+	    vertices[18] = screenx + 3; vertices[19] = screeny + 41;
+	    vertices[20] = screenx + 3; vertices[21] = screeny + 3;
 		shape = new Polygon(vertices);
 	}
 	
@@ -123,13 +118,13 @@ public class Bank extends Building{
 		return row;
 	}
 	
-	public void showInfo() {
+	public void showInfo(float screenX, float screenY) {
 		// to implement
 		System.out.println("It is a BANK!!");
 	}
 
 	@Override
-	public void createCollisionShape(int row, int col) {
+	public void createCollisionShape() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -138,6 +133,47 @@ public class Bank extends Building{
 	public Polygon getCollisionShape() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int getZIndex() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setZIndex(int zIndex) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public int getPeopleSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean isPowered() {
+		// TODO Auto-generated method stub
+		return isPowered;
+	}
+
+	@Override
+	public void setPowered(boolean isPowered) {
+		this.isPowered = isPowered;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return BANK_HEIGHT;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return BANK_WIDTH;
 	}
 
 	final byte clercksLimit = 120;
