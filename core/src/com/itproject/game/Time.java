@@ -2,203 +2,196 @@ package com.itproject.game;
 
 public class Time {
 
-	private byte day;
-	private byte month;
-	private short year;
-	
-	private byte[] days = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	
-	public Time() {
-		this.day = 1;
-		this.month = 1;
-		this.year = 2000;
-	}
-	
-	public Time(byte day, byte month, short year) {
-		this.day = day;
-		this.month = month;
-		this.year = year;
-	}
-	
-	public void nextDay(){
-		switch(month) {
-		case 1:
-			if(day < days[0]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 2:
-			if((year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0))) {
-				days[1] = 29;
-			} else {
-				days[1] = 28;
-			}
-			if(day < days[1]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 3:
-			if(day < days[2]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 4:
-			if(day < days[3]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 5:
-			if(day < days[4]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 6:
-			if(day < days[5]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 7:
-			if(day < days[6]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 8:
-			if(day < days[7]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 9:
-			if(day < days[8]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 10:
-			if(day < days[9]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 11:
-			if(day < days[10]) {
-				day++;
-			} else {
-				month++;
-				day = 1;
-			}
-			break;
-		case 12:
-			if(day < days[11]) {
-				day++;
-			} else {
-				month = 1;
-				day = 1;
-				year++;
-			}
-			break;
-		}
-	}
-	
-	public short getYear() {
-		return year;
-	}
-	
-	public byte getMonth() {
-		return month;
-	}
-	
-	public byte getDay() {
-		return day;
-	}
-	
-	public Time getTime() {
-		return this;	
-	}
-	
-	public int convertDateToDaysOffset() {
-	
-		int first = this.day - 1;
-	
-		for(int i = 0; i < month - 1; i++) {
-			if(year % 4 == 0 && i == 1) {
-				first += days[i];
-				first++;
-			} else {
-				first += days[i];
-			}		
-		}
-		
-		for(int i = 2000; i < year; i++) {
-			if((i % 400 == 0) || ((i % 4 == 0) && (i % 100 != 0))) {
-				first += 366;
-			} else {
-				first += 365;
-			}
-		}	
-		return first;
-	}
-	
-	public String toString() {
-		return "Day: " + day + " Month: " + month + " Year: " + year + "\n";
-	}
-	
-	public Time difference(Time anotherTime) {
+    private byte day;
+    private byte month;
+    private short year;
+
+    public byte[] days = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    public Time() {
+        this.day = 1;
+        this.month = 1;
+        this.year = 2000;
+    }
+
+    public Time(byte day, byte month, short year) {
+        this.day = day;
+        this.month = month;
+        this.year = year;
+    }
+
+    public void nextDay(){
+        switch(month) {
+            case 1:
+                if(day < days[0]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 2:
+                if((year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0))) {
+                    days[1] = 29;
+                } else {
+                    days[1] = 28;
+                }
+                if(day < days[1]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 3:
+                if(day < days[2]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 4:
+                if(day < days[3]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 5:
+                if(day < days[4]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 6:
+                if(day < days[5]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 7:
+                if(day < days[6]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 8:
+                if(day < days[7]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 9:
+                if(day < days[8]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 10:
+                if(day < days[9]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 11:
+                if(day < days[10]) {
+                    day++;
+                } else {
+                    month++;
+                    day = 1;
+                }
+                break;
+            case 12:
+                if(day < days[11]) {
+                    day++;
+                } else {
+                    month = 1;
+                    day = 1;
+                    year++;
+                }
+                break;
+        }
+    }
+
+    public Time subtractInterval(Interval anotherTime) {
         short year;
-        byte month = 0;
-        byte day = 0;
+        byte month = 1;
+        byte day = 1;
 
-        year = (short) (anotherTime.year - this.year);
+        year = (short) (this.year - anotherTime.getYear());
 
-        if (anotherTime.month - this.month > 0) {
-            month = (byte) (anotherTime.month - this.month);
+        if (this.month > anotherTime.getMonth()) {
+            month = (byte) (this.month - anotherTime.getMonth());
         } else {
-            year--;
-            if (this.month - anotherTime.month == 0) {
-                year++;
-            } else {
-                month = (byte) (days.length - this.month + anotherTime.month);
+            if (this.month < anotherTime.getMonth()) {
+                year--;
+                month = (byte) (days.length - anotherTime.getMonth() + this.month);
             }
         }
 
-        if (anotherTime.day - this.day > 0) {
-            day = (byte) (anotherTime.day - this.day);
+        if (this.day > anotherTime.getDay()) {
+            day = (byte) (this.day - anotherTime.getDay());
         } else {
-            month--;
-            if (this.day - anotherTime.day == 0) {
-                month++;
-            } else {
-                day = (byte) (days[month - 1] - this.day + anotherTime.day);
+            if (this.day < anotherTime.getDay()) {
+                day = (byte) (days[month] - anotherTime.getDay() + this.day);
+                month--;
             }
         }
 
         return new Time(day, month, year);
+    }
+
+    public Interval findInterval(Time anotherTime) {
+        short year;
+        byte month;
+        byte day;
+
+        year = (short) (this.year - anotherTime.year);
+
+        if (this.month >= anotherTime.month) {
+            month = (byte) (this.month - anotherTime.month);
+        } else {
+                year--;
+                month = (byte) (days.length + this.month - anotherTime.month);
+        }
+
+        if (this.day >= anotherTime.day) {
+            day = (byte) (this.day - anotherTime.day);
+        } else {
+            month--;
+            day = (byte) (days[month] + this.day - anotherTime.day);
+        }
+
+        return new Interval(day, month, year);
+    }
+
+    public short getYear() {
+        return year;
+    }
+
+    public byte getMonth() {
+        return month;
+    }
+
+    public byte getDay() {
+        return day;
+    }
+
+    public String toString() {
+        return "Day: " + day + " Month: " + month + " Year: " + year + "\n";
     }
 }

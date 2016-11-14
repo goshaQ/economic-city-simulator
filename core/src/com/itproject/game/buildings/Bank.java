@@ -8,6 +8,8 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.City;
+import com.itproject.game.Interval;
 
 public class Bank extends Building{
 
@@ -20,10 +22,10 @@ public class Bank extends Building{
 	public static final int BANK_DESTROYED = 4;
 	public static final int BANK_HEIGHT = 2;
 	public static final int BANK_WIDTH = 2;
-	
-	
+
+
 	boolean isPowered;
-	
+
 	TiledMapTileLayer.Cell[] cell;
 	int state;
 	private int col, row;
@@ -52,7 +54,17 @@ public class Bank extends Building{
 	public void update() {
 		updateSelected();
 	}
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		this.electricityBill = electricityBill;
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		this.waterBill = waterBill;
+	}
+
 	public void updateSelected() {
 		if(state == BANK_SELECTED) {
 			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.bankSelectedCell3));
@@ -132,7 +144,7 @@ public class Bank extends Building{
 	@Override
 	public void setZIndex(int zIndex) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -163,8 +175,54 @@ public class Bank extends Building{
 		// TODO Auto-generated method stub
 		return BANK_WIDTH;
 	}
-	
-	
-	
-	
+
+	final byte clercksLimit = 120;
+	final byte bankersLimit = 60;
+
+	final short clerckSalary = 2400;
+	final short bankersSalary = 4800;
+
+	final short serviceBill = 18000;
+
+	float percent;
+	boolean isLoanTaken;
+	short period;
+	int monthlyPayment;
+
+	public boolean hireEmployee(Citizen employee) {
+		if (clerks.size() <= clercksLimit) {
+			clerks.add(employee);
+
+			employee.salary = clerckSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.CLERCK;
+		} else if(bankers.size() <= bankersLimit) {
+			bankers.add(employee);
+
+			employee.salary = bankersSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.BANKER;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void loan(int amountMoney) {
+		isLoanTaken = true;
+		monthlyPayment = Math.round(amountMoney * (1 + percent) / period);
+
+		City.budget.changeBudget(amountMoney);
+	}
+
+	public void calculatePercent(Interval interval, int amountMoney) {
+		period = (byte) (interval.getYear() * 12 + interval.getMonth());
+		if (electricityBill == 0 && waterBill == 0) {
+
+		} else {
+			percent = (electricityBill + waterBill + serviceBill) * period / amountMoney +
+					City.PRNG.nextFloat() * 6;
+		}
+	}
 }

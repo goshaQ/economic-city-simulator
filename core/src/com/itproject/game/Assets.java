@@ -26,13 +26,13 @@ public class Assets {
 	public static TextureRegion fireStationCell2;
 	public static TextureRegion fireStationCell3;
 	public static TextureRegion fireStationCell4;
-	
+
 	public static Texture fireStationSelected;
 	public static TextureRegion selectedFireStationCell1;
 	public static TextureRegion selectedFireStationCell2;
 	public static TextureRegion selectedFireStationCell3;
 	public static TextureRegion selectedFireStationCell4;
-	
+
 	public static Texture fireStationGreen;
 	public static TextureRegion fireStationGreenCell1;
 	public static TextureRegion fireStationGreenCell2;
@@ -46,7 +46,7 @@ public class Assets {
 	public static TextureRegion policeStationCell4;
 	public static Texture policeStationRedactor;
 	public static TextureRegion policeStationRedactorRegion;
-	
+
 	
 	public static Texture hospital;
 	public static TextureRegion hospitalCell1;
@@ -57,7 +57,7 @@ public class Assets {
 	public static TextureRegion hospitalCell6;
 	public static Texture hospitalRedactor;
 	public static TextureRegion hospitalRedactorRegion;
-	
+
 	public static Texture hospitalSelected;
 	public static TextureRegion hospitalSelectedCell1;
 	public static TextureRegion hospitalSelectedCell2;
@@ -83,7 +83,7 @@ public class Assets {
 	public static TextureRegion bankGreenCell4;
 	public static Texture bankRedactor;
 	public static TextureRegion bankRedactorRegion;
-	
+
 	public static Texture powerStation;
 	public static TextureRegion powerStationCell1;
 	public static TextureRegion powerStationCell2;
@@ -96,11 +96,11 @@ public class Assets {
 	public static TextureRegion powerStationCell9;
 	public static Texture powerStationRedactor;
 	public static TextureRegion powerStationRedactorRegion;
-	
+
 	public static Texture waterStation;
 	public static TextureRegion waterStationRegion;
-	
-	
+
+
 	public static Texture cityHall;
 	public static TextureRegion cityHallCell1;
 	public static TextureRegion cityHallCell2;
@@ -124,23 +124,23 @@ public class Assets {
 	public static TextureRegion selectedDemoBlock;
 	
 	public static TextureRegion mainMenuPlayButton;
-	
+
 	public static Texture loadTexture(String file) {
 		return new Texture(Gdx.files.internal(file));
 	}
-	
+
 	static StaticTiledMapTile[] greenTiles;
 	static StaticTiledMapTile[] bankGreenTiles;
-	
+
 	public static void load() {
 		// For now just a few examples
 		mainMenuPlayButton = new TextureRegion(new Texture("data/mainMenuPlayButton_demo.png"));
-		
-				
+
+
 		tiledMap = new TmxMapLoader().load("data/test_map.tmx");
 		tiledMapRenderer = new IsometricTiledMapRenderer(Assets.tiledMap);
-		
-		
+
+
 		block = loadTexture("data/block.png");
 		demoBlock = new TextureRegion(block);
 		
@@ -167,7 +167,7 @@ public class Assets {
 		cityHallCell5 = new TextureRegion(cityHall, 0, 128, 64, 64);
 		cityHallCell6 = new TextureRegion(cityHall, 64, 128, 64, 64);
 
-		
+
 		bank = loadTexture("data/bank.png");
 		bankCell1 = new TextureRegion(bank,0 ,0, 64, 96);
 		bankCell2 = new TextureRegion(bank,64, 0, 64, 96);
@@ -190,8 +190,8 @@ public class Assets {
 		bankGreenTiles[3] = new StaticTiledMapTile(Assets.bankGreenCell2);
 		bankRedactor = loadTexture("data/bank_redactor.png");
 		bankRedactorRegion = new TextureRegion(bankRedactor);
-		
-		
+
+
 		powerStation = loadTexture("data/powerStation.png");
 		powerStationCell1 = new TextureRegion(powerStation, 0, 0, 64, 96);
 		powerStationCell2 = new TextureRegion(powerStation, 64, 0, 64, 96);
@@ -204,14 +204,14 @@ public class Assets {
 		powerStationCell9 = new TextureRegion(powerStation, 128, 192, 64, 96);
 		powerStationRedactor = loadTexture("data/powerStation_redactor.png");
 		powerStationRedactorRegion = new TextureRegion(powerStationRedactor);
-		
+
 
 		waterStation = loadTexture("data/waterStation.png");
 		waterStationRegion = new TextureRegion(waterStation);
-		
+
 		policeStationRedactor = loadTexture("data/policeStation_redactor.png");
 		policeStationRedactorRegion = new TextureRegion(policeStationRedactor);
-		
+
 		policeStation = loadTexture("data/policeStation.png");
 		policeStationCell1 = new TextureRegion(policeStation, 0, 0, 64, 96);
 		policeStationCell2 = new TextureRegion(policeStation, 64, 0, 64, 96);
@@ -232,13 +232,13 @@ public class Assets {
 		selectedFireStationCell2 = new TextureRegion(fireStationSelected, 64, 0, 64, 96);
 		selectedFireStationCell3 = new TextureRegion(fireStationSelected, 0, 96, 64, 96);
 		selectedFireStationCell4 = new TextureRegion(fireStationSelected, 64, 96, 64, 96);
-		
+
 		fireStationGreen = loadTexture("data/fireStationGreen.png");
 		fireStationGreenCell1 = new TextureRegion(fireStationGreen, 0, 0, 64, 96);
 		fireStationGreenCell2 = new TextureRegion(fireStationGreen, 64, 0, 64, 96);
 		fireStationGreenCell3 = new TextureRegion(fireStationGreen, 0, 96, 64, 96);
 		fireStationGreenCell4 = new TextureRegion(fireStationGreen, 64, 96, 64, 96);
-		
+
 		greenTiles = new StaticTiledMapTile[4];
 		greenTiles[0] = new StaticTiledMapTile(Assets.fireStationGreenCell3);
 		greenTiles[1] = new StaticTiledMapTile(Assets.fireStationGreenCell4);
@@ -255,7 +255,7 @@ public class Assets {
 		hospitalCell6 = new TextureRegion(hospital, 64, 192, 64, 96);
 		hospitalRedactor = loadTexture("data/hospital_redactor.png");
 		hospitalRedactorRegion = new TextureRegion(hospitalRedactor);
-		
+
 		hospitalSelected = loadTexture("data/hospitalSelected.png");
 		hospitalSelectedCell1 = new TextureRegion(hospital, 0, 0, 64, 96);
 		hospitalSelectedCell2 = new TextureRegion(hospital, 64, 0, 64, 96);
@@ -265,10 +265,10 @@ public class Assets {
 		hospitalSelectedCell6 = new TextureRegion(hospital, 64, 192, 64, 96);
 		
 		
-	
+
 		
-	}	
-	
+	}
+
 	public StaticTiledMapTile[] getGreenTiles() {
 		return greenTiles;
 	}
