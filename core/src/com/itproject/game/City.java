@@ -1,5 +1,6 @@
 package com.itproject.game;
 
+import com.itproject.game.buildings.Building;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -18,29 +19,35 @@ public class City {
 
 	public static final float CITY_WIDTH = 10; // to change
 	public static final float CITY_HEIGHT = 15 * 20; // to change
-	
+
 	public static final int CITY_STATE_RUNNING = 0;
 	public static final int CITY_STATE_GAME_OVER = 1;
 
+	float gameTime;
+	public static Time time;
+
 	static final Random DEFAULT_PRNG = new Random();
-	Random PRNG;
-	BiasedRandom BPRNG;
+	public static Random PRNG;
+	public static BiasedRandom BPRNG;
 
 	static float[] birthStatistics = new float[2];
 	static float[] procreateStatistics = new float[2];
-	static float[] deathStatistics = new float[115];
+	static float[] deathStatistics = new float[117];
+	static float[] expensesStatistics = new float[4];
 
 	CityListener listener;
 	List<Citizen> citizens;
-	List<Building> buildings;
+	public static List<Building> buildings;
 	List<Road> road;
 
 	Worldview worldview;
+	public static Budget budget;
 
 	int state;
-	long cityBudget; // long long
 
 	public City(CityListener listener) {
+		loadStatistics();
+
 		this.citizens = new ArrayList<Citizen>();
 		this.buildings = new ArrayList<Building>();
 		this.road = new ArrayList<Road>();
@@ -48,44 +55,42 @@ public class City {
 		this.PRNG = DEFAULT_PRNG;
 		this.BPRNG = new BiasedRandom(this);
 		this.worldview = new Worldview(this);
+		this.budget = new Budget(this);
+		this.time = new Time();
 
 		// Create map generation later
 		// generateMap();
-		this.cityBudget = 10000; // default City budget
-		BiasedRandom BPRNG = new BiasedRandom(this);
-		float[] arr = new float[3];
-		arr[0] = (float) 0.52;
-		arr[1] = (float) 0.24;
-		arr[2] = (float) 0.24;
 
-		int s0 = 0, s1 = 0, s2 = 0;
+        // Init. population
+		citizens.add(new Citizen(Worldview.WorldviewType.WORLDVIEW1, new Interval((byte) 0, (byte)0, (byte)18), (short) 3600));
+		citizens.add(new Citizen(Worldview.WorldviewType.WORLDVIEW2, new Interval((byte) 0, (byte)0, (byte)18), (short) 3600));
+		citizens.add(new Citizen(Worldview.WorldviewType.WORLDVIEW3, new Interval((byte) 0, (byte)0, (byte)18), (short) 3600));
 
-		for (int i = 0; i < 1000; i++) {
-			switch (BPRNG.nextByte(arr, (short) 100)) {
-				case 0:
-					s0++;
-					break;
-				case 1:
-					s1++;
-					break;
-				case 2:
-					s2++;
-					break;
-			}
+		for (int i = 0; i < 97; i++) {
+			citizens.add(new Citizen(worldview.determineType(), new Interval((byte) 0, (byte)0, (byte)18), (short) 3600));
 		}
-		System.out.println(s0 + " " + s1 + " " + s2);
 	}
-	
+
 	/*private void generateMap() {
-		
+
 	}*/
 
 	public void update(float deltaTime) {
-		//updateCitizens(deltaTime);
+		gameTime += deltaTime;
+		if (gameTime >= 1/200f) {
+			time.nextDay();
+
+			updateBuildings();
+			updateCitizens();
+			updatePopulation();
+			checkGameOver();
+
+			gameTime -= 1/200f;
+		}
+
+		//
 		//updateBuildings(deltaTime);
 		//updateRoad(deltaTime);
-		updatePopulation();
-		checkGameOver();
 	}
 
 	public void loadStatistics() {
@@ -103,6 +108,7 @@ public class City {
 			statistics[0] = birthStatistics;
 			statistics[1] = procreateStatistics;
 			statistics[2] = deathStatistics;
+			statistics[3] = expensesStatistics;
 
 			for (int i = 0; i < childNodes.getLength(); i++) {
 				node = childNodes.item(i);
@@ -110,14 +116,14 @@ public class City {
 					node.getParentNode().removeChild(node);
 					i--;
 				} else {
-					NodeList statisticsData = childNodes.item(i).getChildNodes();
+					NodeList statisticsData = node.getChildNodes();
 					for (int j = 0; j < statisticsData.getLength(); j++) {
 						node = statisticsData.item(j);
 						if (node.getTextContent().trim().equals("")) {
 							node.getParentNode().removeChild(node);
 							j--;
 						} else {
-							statistics[i][j] = Byte.parseByte(node.getTextContent());
+							statistics[i][j] = Float.parseFloat(node.getTextContent());
 						}
 					}
 				}
@@ -127,47 +133,82 @@ public class City {
 		}
 	}
 
-	// add usage of biased random
 	private void updatePopulation() {
-		Citizen firstParent = null;
+		List<Citizen> newCitizens = new ArrayList<>();
+
+        Citizen firstParent = null;
 		Citizen secondParent = null;
 
 		int throwDie;
+		short moneyForChild = 0;
 		float happinessContribution = 0;
 
 		Iterator<Citizen> citizen = citizens.iterator();
 		while (citizen.hasNext()) {
-			if (citizen.hasNext() && firstParent == null) {
+			if (citizen.hasNext()) {
 				firstParent = citizen.next();
 			}
 
-			if (citizen.hasNext() && secondParent == null) {
+			if (citizen.hasNext()) {
 				secondParent = citizen.next();
 			}
 
 			if ( (firstParent != null && secondParent != null) &&
 					(firstParent.isReadyToProcreate && secondParent.isReadyToProcreate)) {
-				if (firstParent.happinessLevel > 60 && secondParent.happinessLevel > 60) {
-					happinessContribution = (firstParent.happinessLevel - 60) + (secondParent.happinessLevel - 60) / 10000;
+                if (firstParent.happinessLevel > 60 && secondParent.happinessLevel > 60) {
+					happinessContribution = ((firstParent.happinessLevel - 60) + (secondParent.happinessLevel - 60)) / 10000;
 					procreateStatistics[1] += happinessContribution;
 				} else if (firstParent.happinessLevel < 45 && secondParent.happinessLevel < 45) {
-					happinessContribution = (45 - firstParent.happinessLevel) + (45 - secondParent.happinessLevel) / -10000;
+					happinessContribution = ((45 - firstParent.happinessLevel) + (45 - secondParent.happinessLevel)) / -10000;
 					procreateStatistics[1] += happinessContribution;
 				}
 
-				throwDie = BPRNG.nextByte(procreateStatistics, (short)100);
-				if (throwDie == 1) {
-					throwDie = BPRNG.nextByte(birthStatistics, (short)1000);
+				throwDie = BPRNG.nextByte(procreateStatistics, (short)1000);
+                if (throwDie == 1) {
+					throwDie = BPRNG.nextByte(birthStatistics, (short)100);
 					if (throwDie == 0) {
-						citizens.add(new Citizen(worldview.determineType(), this));
+						if (firstParent.moneySavings - 1200 >= 0) {
+							firstParent.moneySavings -= 1200;
+							moneyForChild += 1200;
+						} else {
+							moneyForChild += (short) firstParent.moneySavings;
+							firstParent.moneySavings = 0;
+						}
+
+						if (secondParent.moneySavings - 1200 >= 0) {
+							secondParent.moneySavings -= 1200;
+							moneyForChild += 1200;
+						} else {
+							moneyForChild += (short) secondParent.moneySavings;
+							secondParent.moneySavings = 0;
+						}
+
+						newCitizens.add(new Citizen(worldview.determineType(), moneyForChild));
 					} else {
-						citizens.add(new Citizen(worldview.determineType(), this));
-						citizens.add(new Citizen(worldview.determineType(), this));
+						if (firstParent.moneySavings - 2400 >= 0) {
+							firstParent.moneySavings -= 2400;
+							moneyForChild += 1200;
+						} else {
+							moneyForChild += (short) (firstParent.moneySavings >> 1);
+							firstParent.moneySavings = 0;
+						}
+
+						if (secondParent.moneySavings - 2400 >= 0) {
+							secondParent.moneySavings -= 2400;
+							moneyForChild += 1200;
+						} else {
+							moneyForChild += (short) (secondParent.moneySavings >> 1);
+							secondParent.moneySavings = 0;
+						}
+
+						newCitizens.add(new Citizen(worldview.determineType(), moneyForChild));
+						newCitizens.add(new Citizen(worldview.determineType(), moneyForChild));
 					}
 
-					firstParent.ageOfLastProcreation = firstParent.age;
-					secondParent.ageOfLastProcreation = secondParent.age;
+					firstParent.ageOfLastProcreation.concatenateWith(firstParent.age.subtractInterval(firstParent.ageOfLastProcreation));
+                    secondParent.ageOfLastProcreation.concatenateWith(secondParent.age.subtractInterval(secondParent.ageOfLastProcreation));
 					secondParent.isReadyToProcreate = firstParent.isReadyToProcreate = false;
+					moneyForChild = 0;
 				}
 
 				if (happinessContribution != 0) {
@@ -176,18 +217,35 @@ public class City {
 				}
 			}
 
-			if (!firstParent.isReadyToProcreate) {
-				firstParent = null;
-			}
-
-			if (!secondParent.isReadyToProcreate) {
-				secondParent = null;
-			}
+            firstParent = secondParent = null;
 		}
 
+		citizens.addAll(newCitizens);
+    }
+
+	private void updateCitizens() {
+        List<Citizen> deadCitizens = new ArrayList<>();
+
+		int previousYear;
+        for (Citizen c : citizens) {
+			previousYear = c.age.getYear();
+			c.update();
+
+			if (c.age.getYear() > previousYear || (c.age.getYear() == 0 && c.age.getMonth() == 0 && c.age.getDay() == 7)) {
+                if(!c.isAlive()) {
+					deadCitizens.add(c);
+                }
+            }
+		}
+
+		citizens.removeAll(deadCitizens);
+	}
+
+	public void updateBuildings() {
+		buildings.forEach(Building::update);
 	}
 
 	private void checkGameOver() {
-		
+
 	}
 }

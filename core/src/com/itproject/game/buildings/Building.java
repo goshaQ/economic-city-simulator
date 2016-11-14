@@ -9,8 +9,9 @@ abstract public class Building {
 	
 	public int cost;
 	public int serviceCost;
+	public short electricityBill;
+	public short waterBill;
 
-	
 	public Building(int cost, int serviceCost) {
 		this.cost = cost;
 		this.serviceCost = serviceCost;
@@ -25,5 +26,6 @@ abstract public class Building {
 	abstract public void showInfo();
 	abstract public void setState(int state);
 	abstract public void update();
-		
+	abstract public void setElectricityBill(short electricityBill);
+	abstract public void setWaterBill(short waterBill);
 }

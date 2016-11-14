@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 
 public class Assets {
 
@@ -27,7 +28,7 @@ public class Assets {
 	public static TextureRegion fireStationCell4;
 	public static TextureRegion fireStationCell5;
 	public static TextureRegion fireStationCell6;
-	
+
 	public static Texture fireStationSelected;
 	public static TextureRegion selectedFireStationCell1;
 	public static TextureRegion selectedFireStationCell2;
@@ -70,7 +71,7 @@ public class Assets {
 	public static Texture loadTexture(String file) {
 		return new Texture(Gdx.files.internal(file));
 	}
-	
+
 	public static void load() {
 		// For now just a few examples
 		block = loadTexture("data/block.png");
@@ -110,7 +111,7 @@ public class Assets {
 		fireStationCell4 = new TextureRegion(fireStation, 64, 64, 64, 64);
 		fireStationCell5 = new TextureRegion(fireStation, 0, 128, 64, 64);
 		fireStationCell6 = new TextureRegion(fireStation, 64, 128, 64, 64);
-		
+
 		fireStationSelected = loadTexture("data/fireStationSelected.png");
 		selectedFireStationCell1 = new TextureRegion(fireStationSelected, 0, 0, 64, 64);
 		selectedFireStationCell2 = new TextureRegion(fireStationSelected, 64, 0, 64, 64);
@@ -142,5 +143,5 @@ public class Assets {
 		
 		
 		
-	}	
+	}
 }

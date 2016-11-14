@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector3;
 import com.itproject.game.buildings.Building;
@@ -100,18 +99,27 @@ public class CityRenderer {
 		        	if(GameScreen.redactorState == GameScreen.BUILD_BLOCK) 
 		        		buildHouse(row, col, layer);
 		        	
-		        	if(GameScreen.redactorState == GameScreen.BUILD_FIRESTATION)
-		        		buildFireStation(row, col, layer);
-		        	
+		        	if(GameScreen.redactorState == GameScreen.BUILD_FIRESTATION) {
+						int fireStationWidth = 2, fireStationLength = 3;
+						StaticTiledMapTile[] tiles = new StaticTiledMapTile[fireStationLength * fireStationWidth];
+						tiles[0] = new StaticTiledMapTile(Assets.fireStationCell5);
+						tiles[1] = new StaticTiledMapTile(Assets.fireStationCell6);
+						tiles[2] = new StaticTiledMapTile(Assets.fireStationCell3);
+						tiles[3] = new StaticTiledMapTile(Assets.fireStationCell4);
+						tiles[4] = new StaticTiledMapTile(Assets.fireStationCell1);
+						tiles[5] = new StaticTiledMapTile(Assets.fireStationCell2);
+
+						buildFireStation(row, col, fireStationWidth, fireStationLength, tiles, layer, FireStation.class.getName());
+					}
+
 		        	GameScreen.state = GameScreen.GAME_RUNNING;
 		        } else {
-		        	for(Building station : city.getBuildingList()) {
+		        	for(Building station : city.buildings) {
 		        		
 		        		if(station.getShape().contains(position.x, position.y) && station instanceof FireStation) {
 		        			if(lastSelected != null) {
 		        				lastSelected.setState(FireStation.FIRE_STATION_UNSELECTED);
-		        					
-		        			} 
+							}
 			        			
 		        			lastSelected = station;
 			        		station.setState(FireStation.FIRE_STATION_SELECTED);
@@ -140,70 +148,32 @@ public class CityRenderer {
 	        	TiledMapTileLayer.Cell cell = layer.getCell(row, col);
 				StaticTiledMapTile tile = new StaticTiledMapTile(Assets.demoBlock);
 				cell.setTile(tile);
-				city.getBuildingList().add(new House(row, col));
-				city.getBuildingList().get(city.getBuildingList().size()-1).createShape(row, col);
-				city.getBuildingList().get(city.getBuildingList().size()-1).createCollisionShape(row, col);
+				city.buildings.add(new House(row, col));
+				city.buildings.get(city.buildings.size()-1).createShape(row, col);
+				city.buildings.get(city.buildings.size()-1).createCollisionShape(row, col);
 	        }
 		 return;
 	}
+
 	
-	
-	private void buildHospital(int row, int col, TiledMapTileLayer layer) {
-		 if( (col >= 0 && col < 100) && (row >= 0 && row < 100) ) {	
-	        	TiledMapTileLayer.Cell cell1 = layer.getCell(row, col);
-	        	TiledMapTileLayer.Cell cell2 = layer.getCell(row+1, col);
-	        	TiledMapTileLayer.Cell cell3 = layer.getCell(row, col+1);
-	        	TiledMapTileLayer.Cell cell4 = layer.getCell(row+1, col+1);
-	        	TiledMapTileLayer.Cell cell5 = layer.getCell(row, col+2);
-	        	TiledMapTileLayer.Cell cell6 = layer.getCell(row+1, col+2);
-	        	
-				StaticTiledMapTile tile1 = new StaticTiledMapTile(Assets.fireStationCell5);
-				StaticTiledMapTile tile2 = new StaticTiledMapTile(Assets.fireStationCell6);
-				StaticTiledMapTile tile3 = new StaticTiledMapTile(Assets.fireStationCell3);
-				StaticTiledMapTile tile4 = new StaticTiledMapTile(Assets.fireStationCell4);
-				StaticTiledMapTile tile5 = new StaticTiledMapTile(Assets.fireStationCell1);
-				StaticTiledMapTile tile6 = new StaticTiledMapTile(Assets.fireStationCell2);
-				
-				cell1.setTile(tile1);
-				cell2.setTile(tile2);
-				cell3.setTile(tile3);
-				cell4.setTile(tile4);
-				cell5.setTile(tile5);
-				cell6.setTile(tile6);
-				
-				city.getBuildingList().add(new FireStation(row, col));
-				city.getBuildingList().get(city.getBuildingList().size()-1).createShape(row, col);
-	        }
-		 return;
-	}
-	
-	private void buildFireStation(int row, int col, TiledMapTileLayer layer) {
-		 if( (col >= 0 && col < 100) && (row >= 0 && row < 100) ) {	
-	        	TiledMapTileLayer.Cell cell1 = layer.getCell(row, col);
-	        	TiledMapTileLayer.Cell cell2 = layer.getCell(row+1, col);
-	        	TiledMapTileLayer.Cell cell3 = layer.getCell(row, col+1);
-	        	TiledMapTileLayer.Cell cell4 = layer.getCell(row+1, col+1);
-	        	TiledMapTileLayer.Cell cell5 = layer.getCell(row, col+2);
-	        	TiledMapTileLayer.Cell cell6 = layer.getCell(row+1, col+2);
-	        	
-				StaticTiledMapTile tile1 = new StaticTiledMapTile(Assets.fireStationCell5);
-				StaticTiledMapTile tile2 = new StaticTiledMapTile(Assets.fireStationCell6);
-				StaticTiledMapTile tile3 = new StaticTiledMapTile(Assets.fireStationCell3);
-				StaticTiledMapTile tile4 = new StaticTiledMapTile(Assets.fireStationCell4);
-				StaticTiledMapTile tile5 = new StaticTiledMapTile(Assets.fireStationCell1);
-				StaticTiledMapTile tile6 = new StaticTiledMapTile(Assets.fireStationCell2);
-				
-				cell1.setTile(tile1);
-				cell2.setTile(tile2);
-				cell3.setTile(tile3);
-				cell4.setTile(tile4);
-				cell5.setTile(tile5);
-				cell6.setTile(tile6);
-				
-				city.getBuildingList().add(new FireStation(row, col));
-				city.getBuildingList().get(city.getBuildingList().size()-1).createShape(row, col);
-	        }
-		 return;
+	private void buildFireStation(int row, int col, int width, int length, StaticTiledMapTile[] tiles, TiledMapTileLayer layer, String name) {
+		if( (col >= 0 && col < 100) && (row >= 0 && row < 100) ) {
+			int tileCounter = 0;
+
+			for (int i = 0; i < length; i++) {
+				for (int j = 0; j < width; j++) {
+					layer.getCell(row + j, col + i).setTile(tiles[tileCounter]);
+					tileCounter++;
+				}
+			}
+
+			try {
+				city.buildings.add( (Building) Class.forName(name).getConstructor(int.class, int.class).newInstance(row, col));
+				city.buildings.get(city.buildings.size()-1).createShape(row, col);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private void handleInput() {

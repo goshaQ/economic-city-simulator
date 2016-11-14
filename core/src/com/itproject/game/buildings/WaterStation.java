@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.City;
 
 public class WaterStation extends Building {
 
@@ -40,7 +41,17 @@ public class WaterStation extends Building {
 	public void update() {
 		updateSelected();
 	}
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		//not used for WaterStation
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		//not used for WaterStation
+	}
+
 	public void updateSelected() {
 		/*if(state == WATER_STATION_SELECTED) {
 			cell[0] = layer.getCell(row, col);
@@ -120,6 +131,60 @@ public class WaterStation extends Building {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
+	final byte buildingsLimit = 8;
+	final byte employeeLimitForBlock = 4;
+	final short employeeSalary = 3200;
+	final short monthlyExpenses = 4000;
+	final short dailyExpenses = 400;
+	final short baseProfitRate = 600;
+
+	public int currentProfit;
+	public short taxes;
+
+	List<Building> buildings;
+	List<Citizen> employees;
+
+	public boolean attachBuilding(Building building) {
+		if (buildings.size() <= buildingsLimit) {
+			buildings.add(building);
+
+			// TODO properties in building
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean hireEmployee(Citizen employee) {
+		if (employees.size() <= Math.ceil(buildings.size() / 2) * employeeLimitForBlock) {
+			employees.add(employee);
+
+			employee.salary = employeeSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.WATERSTATIONWORKER;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void calculateBIll() {
+		short waterBill;
+
+		calculateMarkup();
+		waterBill = (short) Math.round((City.time.days[City.time.getMonth() - 1] * dailyExpenses + monthlyExpenses
+				+ employees.size() * employeeSalary + currentProfit) / buildings.size());
+
+		City.budget.changeBudget(currentProfit);
+
+		employees.forEach(employee -> employee.getSalary());
+		buildings.forEach(building -> building.setWaterBill(waterBill));
+	}
+
+	private void calculateMarkup() {
+		currentProfit = (short) ((City.PRNG.nextInt(400) + baseProfitRate) * buildings.size());
+	}
 }

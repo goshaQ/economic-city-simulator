@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.City;
 
 public class Hospital extends Building{
 
@@ -23,7 +24,6 @@ public class Hospital extends Building{
 	private int col, row;
 	private Polygon shape;
 	List<Citizen> doctors;
-	List<Citizen> sickPeople;
 	TiledMapTileLayer layer;
 	  
 	public Hospital(int row, int col) {
@@ -35,14 +35,13 @@ public class Hospital extends Building{
 		this.row = row;
 		cell = new TiledMapTileLayer.Cell[6];
 		doctors = new ArrayList<Citizen>(10); // default 10 firefighters at start
-		sickPeople = new ArrayList<Citizen>(10); 
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
 	}
 	
 	public void update() {
 		updateSelected();
 	}
-	
+
 	public void updateSelected() {
 		/*if(state == HOSPITAL_SELECTED) {
 			cell[0] = layer.getCell(row, col);
@@ -122,6 +121,67 @@ public class Hospital extends Building{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		this.electricityBill = electricityBill;
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		this.electricityBill = waterBill;
+	}
+
+	final byte doctorsLimit = 16;
+	final short monthlyPatientLimit = 800;
+	final float baseTreatmentBill = 0.25f;
+	final short serviceBill = 12000;
+	final short employeeSalary = 9200;
+
+	short curedPatients;
+
+	short treatmentBill;
+	int currentProfit;
+	short collectedMoney;
+
+	public boolean hireEmployee(Citizen employee) {
+		if (doctors.size() <= doctorsLimit) {
+			doctors.add(employee);
+
+			employee.salary = employeeSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.DOCTOR;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public int visitHospital(Citizen patient) {
+		if (curedPatients <= monthlyPatientLimit) {
+			curedPatients++;
+
+			calculateTreatmentBill(patient);
+			if (!(patient.moneySavings < treatmentBill)) {
+				return 0;
+			}
+
+			collectedMoney += treatmentBill;
+			return treatmentBill;
+		}
+
+		return 0;
+	}
+
+	public void payForFunctioning() {
+		currentProfit = collectedMoney - waterBill - electricityBill - serviceBill - doctors.size() * employeeSalary;
+		City.budget.changeBudget(currentProfit);
+
+		collectedMoney = 0;
+	}
+
+	public void calculateTreatmentBill(Citizen patient) {
+		treatmentBill = (short) Math.round((City.PRNG.nextFloat() * 0.15 + baseTreatmentBill) * patient.salary);
+	}
 }

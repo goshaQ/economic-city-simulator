@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.City;
 
 public class House extends Building {
 	
@@ -44,7 +45,6 @@ public class House extends Building {
 	public void update() {
 		updateSelected();
 	}
-	
 
 	public void updateSelected() {
 		if(state == HOUSE_SELECTED) {
@@ -113,4 +113,50 @@ public class House extends Building {
 		this.state = state;
 	}
 
+	final short serviceBill = 16000;
+	final short baseProfitRate = 100;
+
+	short collectedMoney;
+	public short utilityBill;
+	short currentProfit;
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		this.electricityBill = electricityBill;
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		this.waterBill = waterBill;
+	}
+
+	public void calculateUtilityBill() {
+		calculateMarkup();
+		utilityBill = (short) ((electricityBill + waterBill + serviceBill + currentProfit) / residents.size());
+	}
+
+	public short payUtility(Citizen resident) {
+		if (resident.moneySavings - utilityBill >= 0) {
+			collectedMoney += utilityBill;
+			return utilityBill;
+		} else {
+			return 0;
+		}
+	}
+
+	public void moveOut(Citizen resident) {
+		residents.remove(resident);
+	}
+
+	public void payProviderOfPowerAndWater() {
+		if (collectedMoney - serviceBill >= electricityBill + waterBill) {
+			City.budget.changeBudget(currentProfit);
+		} else {
+			City.budget.changeBudget(-(electricityBill + waterBill + serviceBill - collectedMoney));
+		}
+	}
+
+	private void calculateMarkup() {
+		currentProfit = (short) ((City.PRNG.nextInt(120) + baseProfitRate) * residents.size());
+	}
 }

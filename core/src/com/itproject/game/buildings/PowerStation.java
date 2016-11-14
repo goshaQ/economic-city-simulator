@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.City;
 
 public class PowerStation extends Building{
 
@@ -22,7 +23,6 @@ public class PowerStation extends Building{
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> worker;
 	TiledMapTileLayer layer;
 	  
 	public PowerStation(int row, int col) {
@@ -33,14 +33,27 @@ public class PowerStation extends Building{
 		this.col = col;
 		this.row = row;
 		cell = new TiledMapTileLayer.Cell[6];
-		worker = new ArrayList<Citizen>(10); // default 10 firefighters at start
+
+		employees = new ArrayList<>();
+		buildings = new ArrayList<>();
+
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
 	}
 	
 	public void update() {
 		updateSelected();
 	}
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		//not used for PowerStation
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		//not used for PowerStation
+	}
+
 	public void updateSelected() {
 		/*if(state == POWER_STATION_SELECTED) {
 			cell[0] = layer.getCell(row, col);
@@ -120,6 +133,60 @@ public class PowerStation extends Building{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
+	final byte buildingsLimit = 12;
+	final byte employeeLimitForBlock = 10;
+	final short employeeSalary = 4800;
+	final short monthlyExpenses = 10000;
+	final short dailyExpenses = 2000;
+	final short baseProfitRate = 800;
+
+	public int currentProfit;
+	public short taxes;
+
+	List<Building> buildings;
+	List<Citizen> employees;
+
+	public boolean attachBuilding(Building building) {
+		if (buildings.size() <= buildingsLimit) {
+			buildings.add(building);
+
+			// TODO properties in building
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean hireEmployee(Citizen employee) {
+		if (employees.size() <= Math.ceil(buildings.size() / 2) * employeeLimitForBlock) {
+			employees.add(employee);
+
+			employee.salary = employeeSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.POWERSTATIONWORKER;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void calculateBIll() {
+		short electricityBill;
+
+		calculateMarkup();
+		electricityBill = (short) Math.round((City.time.days[City.time.getMonth() - 1] * dailyExpenses + monthlyExpenses
+				+ employees.size() * employeeSalary + currentProfit) / buildings.size());
+
+		City.budget.changeBudget(currentProfit);
+
+		employees.forEach(employee -> employee.getSalary());
+		buildings.forEach(building -> building.setElectricityBill(electricityBill));
+	}
+
+	private void calculateMarkup() {
+		currentProfit = (short) ((City.PRNG.nextInt(400) + baseProfitRate) * buildings.size());
+	}
 }

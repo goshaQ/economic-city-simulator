@@ -1,6 +1,7 @@
 package com.itproject.game;
 
 public class BiasedRandom {
+    private static byte[] precisionOfOneTenth = new byte[10];
     private static byte[] precisionOfOneHundredth = new byte[100];
     private static byte[] precisionOfOneThousandth = new byte[1000];
     private final City city;
@@ -17,6 +18,12 @@ public class BiasedRandom {
         // Fill the appropriate array
         for (byte i = 1; i < probabilities.length; i++) {
             switch (precision) {
+                case 10:
+                    for (byte j = (byte) (totalPercentage * 10); j < (byte) (totalPercentage * 10 + probabilities[i] * 10); j++) {
+                        precisionOfOneTenth[j] = i;
+                    }
+                    totalPercentage += probabilities[i] + 0.1;
+                    break;
                 case 100:
                     for (byte j = (byte) (totalPercentage * 100); j < (byte) (totalPercentage * 100 + probabilities[i] * 100); j++) {
                         precisionOfOneHundredth[j] = i;
@@ -35,6 +42,9 @@ public class BiasedRandom {
         // Generate number
         throwDie = (short) city.PRNG.nextInt(precision - 1);
         switch (precision) {
+            case 10:
+                result = precisionOfOneTenth[throwDie];
+                break;
             case 100:
                 result = precisionOfOneHundredth[throwDie];
                 break;
@@ -45,6 +55,11 @@ public class BiasedRandom {
 
         // Clear the array for use in future
         switch (precision) {
+            case 10:
+                for (byte i = 0; i < (byte) (totalPercentage * 10); i++) {
+                    precisionOfOneHundredth[i] = 0;
+                }
+                break;
             case 100:
                 for (byte i = 0; i < (byte) (totalPercentage * 100); i++) {
                     precisionOfOneHundredth[i] = 0;
