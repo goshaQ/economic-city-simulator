@@ -8,6 +8,8 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.Hud;
+import com.itproject.game.BuildingRedactorWindow;
 
 public class FireStation extends Building {
 	
@@ -18,24 +20,27 @@ public class FireStation extends Building {
 	public static final int FIRE_STATION_SELECTED = 2;
 	public static final int FIRE_STATION_UNSELECTED = 3;
 	public static final int FIRE_STATION_DESTROYED = 4;
+	public static final int FIRE_STATION_HEIGHT = 2;
+	public static final int FIRE_STATION_WIDTH = 2;
 	
-	TiledMapTileLayer.Cell[] cell;
+	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
+	private Polygon collisionShape;
 	List<Citizen> firefighters;
 	TiledMapTileLayer layer;
-	  
+	int zIndex;
+	
 	public FireStation(int row, int col) {
 		super(5000, 300);
 		
 		state = 0;
-		
+		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		cell = new TiledMapTileLayer.Cell[6];
 		firefighters = new ArrayList<Citizen>(10); // default 10 firefighters at start
-		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
+		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
 	public void sendCrew() {
@@ -48,44 +53,34 @@ public class FireStation extends Building {
 	
 	public void updateSelected() {
 		if(state == FIRE_STATION_SELECTED) {
-			cell[0] = layer.getCell(row, col);
-			cell[1] = layer.getCell(row + 1, col);
-			cell[2] = layer.getCell(row, col + 1);
-			cell[3] = layer.getCell(row + 1, col + 1);
-			cell[4] = layer.getCell(row, col + 2);
-			cell[5] = layer.getCell(row + 1, col + 2);
-			
-			cell[0].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));
 		} else if(state == FIRE_STATION_UNSELECTED) {
 	
-			cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.fireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.fireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.fireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.fireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.fireStationCell3));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.fireStationCell4));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.fireStationCell1));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.fireStationCell2));
 			
 			state = FIRE_STATION_OK;
 		}
 	}
 	
-	public void createShape(int row, int col) {
-		this.col = col; 
-		this.row = row;
+	public void createShape() {
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
-	    float[] vertices = new float[12];
-	    vertices[0] = screenx;   vertices[1] = screeny;
-	    vertices[2] = screenx + 64; vertices[3] = screeny - 32;
-	    vertices[4] = screenx + 128; vertices[5] = screeny;
-	    vertices[6] = screenx + 128; vertices[7] = screeny + 32;
-	    vertices[8] = screenx + 64; vertices[9] = screeny - 32 + 128;
-	    vertices[10] = screenx; vertices[11] = screeny + 64;
+	    float[] vertices = {
+    		screenx,	screeny,
+    	    screenx + 64, screeny - 32,
+    	    screenx + 128, screeny,
+    	    screenx + 128, screeny + 32,
+    	    screenx + 128 - 33, screeny + 64,
+    	    screenx + 64, screeny - 32 + 96,
+    	    screenx, screeny + 32
+	    };
+	    
 		shape = new Polygon(vertices);
 	}
 	
@@ -109,22 +104,69 @@ public class FireStation extends Building {
 		return row;
 	}
 	
-	public void showInfo() {
+	public void showInfo(float screenX, float screenY) {
 		// to implement
+		//Hud.stage.addActor(new BuildingInformationWindow());
+		this.firefighters.add(new Citizen());
+		Hud.setInformationScreen(this, screenX, screenY);
 		System.out.println("It is a FIRESTATION!!");
 	}
 
 	@Override
-	public void createCollisionShape(int row, int col) {
-		// TODO Auto-generated method stub
-		
+	public void createCollisionShape() {
+		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
+	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
+	    float[] vertices = {
+    		screenx,	screeny,
+    	    screenx + 64, screeny - 32,
+    	    screenx + 128, screeny,
+    	    screenx + 64, screeny + 32
+	    };
+	    
+		collisionShape = new Polygon(vertices);
 	}
 
 	@Override
 	public Polygon getCollisionShape() {
 		// TODO Auto-generated method stub
-		return null;
+		return collisionShape;
 	}
 	
+	@Override
+	public void setZIndex(int zIndex) {
+		this.zIndex = zIndex;
+	}
 	
+	@Override
+	public int getZIndex() {
+		return this.zIndex;
+	}
+	
+	public int getPeopleSize() {
+		return firefighters.size(); 
+	}
+
+	@Override
+	public boolean isPowered() {
+		return isPowered;
+	}
+
+	@Override
+	public void setPowered(boolean isPowered) {
+		this.isPowered = isPowered;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return FIRE_STATION_HEIGHT;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return FIRE_STATION_WIDTH;
+	}
+	
+
 }

@@ -140,10 +140,65 @@ public class Time {
 	}
 	
 	public Time getTime() {
-		return this;
+		return this;	
+	}
+	
+	public int convertDateToDaysOffset() {
+	
+		int first = this.day - 1;
+	
+		for(int i = 0; i < month - 1; i++) {
+			if(year % 4 == 0 && i == 1) {
+				first += days[i];
+				first++;
+			} else {
+				first += days[i];
+			}		
+		}
+		
+		for(int i = 2000; i < year; i++) {
+			if((i % 400 == 0) || ((i % 4 == 0) && (i % 100 != 0))) {
+				first += 366;
+			} else {
+				first += 365;
+			}
+		}	
+		return first;
 	}
 	
 	public String toString() {
 		return "Day: " + day + " Month: " + month + " Year: " + year + "\n";
 	}
+	
+	public Time difference(Time anotherTime) {
+        short year;
+        byte month = 0;
+        byte day = 0;
+
+        year = (short) (anotherTime.year - this.year);
+
+        if (anotherTime.month - this.month > 0) {
+            month = (byte) (anotherTime.month - this.month);
+        } else {
+            year--;
+            if (this.month - anotherTime.month == 0) {
+                year++;
+            } else {
+                month = (byte) (days.length - this.month + anotherTime.month);
+            }
+        }
+
+        if (anotherTime.day - this.day > 0) {
+            day = (byte) (anotherTime.day - this.day);
+        } else {
+            month--;
+            if (this.day - anotherTime.day == 0) {
+                month++;
+            } else {
+                day = (byte) (days[month - 1] - this.day + anotherTime.day);
+            }
+        }
+
+        return new Time(day, month, year);
+    }
 }
