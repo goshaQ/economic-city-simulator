@@ -9,7 +9,9 @@ abstract public class Building {
 	
 	public int cost;
 	public int serviceCost;
-	
+	public short electricityBill;
+	public short waterBill;
+
 	public Building(int cost, int serviceCost) {
 		this.cost = cost;
 		this.serviceCost = serviceCost;
@@ -24,6 +26,8 @@ abstract public class Building {
 	abstract public void showInfo(float screenX, float screenY);
 	abstract public void setState(int state);
 	abstract public void update();
+	abstract public void setElectricityBill(short electricityBill);
+	abstract public void setWaterBill(short waterBill);
 	abstract public int getZIndex();
 	abstract public void setZIndex(int zIndex);
 	abstract public int getPeopleSize();
@@ -31,5 +35,5 @@ abstract public class Building {
 	abstract public void setPowered(boolean isPowered);
 	abstract public int getHeight();
 	abstract public int getWidth();
-		
+
 }

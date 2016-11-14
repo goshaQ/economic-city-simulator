@@ -43,7 +43,17 @@ public class CityHall extends Building {
 	public void update() {
 		updateSelected();
 	}
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		this.electricityBill = electricityBill;
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		this.waterBill = waterBill;
+	}
+
 	public void updateSelected() {
 		/*if(state == CITYHALL_SELECTED) {
 			cell[0] = layer.getCell(row, col);
