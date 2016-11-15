@@ -8,18 +8,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector3;
 import com.itproject.game.buildings.Bank;
+import com.itproject.game.buildings.Bar;
 import com.itproject.game.buildings.Building;
 import com.itproject.game.buildings.CityHall;
 import com.itproject.game.buildings.FireStation;
+import com.itproject.game.buildings.GroceryShop;
 import com.itproject.game.buildings.Hospital;
 import com.itproject.game.buildings.House;
 import com.itproject.game.buildings.PoliceStation;
@@ -70,7 +68,7 @@ public class CityRenderer {
 				}
 			}	
 			
-			for(Building building : city.getBuildingList()) {
+			for(Building building : City.buildings) {
 				if(building instanceof PowerStation) {
 					if(((col >= building.getCol() - PowerStation.POWER_RADIUS && col <= building.getCol() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_HEIGHT - 1 && row >= building.getRow() - PowerStation.POWER_RADIUS && row <= building.getRow() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_HEIGHT - 1)
 					   || (col + newBuilding.getWidth() - 1 >= building.getCol() - PowerStation.POWER_RADIUS && col + newBuilding.getWidth() - 1 <= building.getCol() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_WIDTH - 1&& row + newBuilding.getWidth() - 1 >= building.getRow() - PowerStation.POWER_RADIUS && row + newBuilding.getWidth() - 1 <= building.getRow() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_WIDTH - 1)) 
@@ -202,6 +200,32 @@ public class CityRenderer {
 					} 
 				}
 				
+				if(GameScreen.redactorState == GameScreen.BUILD_BAR) {
+					if( (col >= 0 && col < 99) && (row >= 0 && row < 99) ) {	
+						if(lastRow != -10000 && lastCol != -10000) {
+							if(Math.abs(lastRow - row) != 0 || Math.abs(lastCol - col) != 0) {
+									tempTiles = buildGreen(row, col, lastRow, lastCol, Bar.BAR_WIDTH, Bar.BAR_HEIGHT, tempTiles, Assets.barGreenTiles, layer);
+							}
+						} else {	
+							tempTiles = buildGreen(row, col, lastRow, lastCol, Bar.BAR_WIDTH, Bar.BAR_HEIGHT, tempTiles, Assets.barGreenTiles, layer);
+						}				
+						lastRow = row; lastCol = col;
+					} 
+				}
+				
+				if(GameScreen.redactorState == GameScreen.BUILD_GROCERY_SHOP) {
+					if( (col >= 0 && col < 99) && (row >= 0 && row < 99) ) {	
+						if(lastRow != -10000 && lastCol != -10000) {
+							if(Math.abs(lastRow - row) != 0 || Math.abs(lastCol - col) != 0) {
+									tempTiles = buildGreen(row, col, lastRow, lastCol, GroceryShop.GROCERY_SHOP_WIDTH, GroceryShop.GROCERY_SHOP_HEIGHT, tempTiles, Assets.groceryShopGreenTiles, layer);
+							}
+						} else {	
+							tempTiles = buildGreen(row, col, lastRow, lastCol, GroceryShop.GROCERY_SHOP_WIDTH, GroceryShop.GROCERY_SHOP_HEIGHT, tempTiles, Assets.groceryShopGreenTiles, layer);
+						}				
+						lastRow = row; lastCol = col;
+					} 
+				}
+				
 				if(GameScreen.redactorState == GameScreen.BUILD_HOUSE) {
 					StaticTiledMapTile[] greenTiles = {
 							new StaticTiledMapTile(Assets.greenDemoBlock)
@@ -256,7 +280,7 @@ public class CityRenderer {
 
 	        		house.createShape();
 	        		house.createCollisionShape();
-		        	city.buildings.add(house);
+		        	City.buildings.add(house);
 		        	}
 	        	}
 	        				        	
@@ -289,7 +313,7 @@ public class CityRenderer {
 	        	    
 		        	fireStation.createShape();
 		        	fireStation.createCollisionShape();
-		        	city.buildings.add(fireStation);
+		        	City.buildings.add(fireStation);
 		        	
 		        	}
 	        	}
@@ -324,7 +348,7 @@ public class CityRenderer {
 				    
 			    	policeStation.createShape();
 			    	policeStation.createCollisionShape();
-			    	city.buildings.add(policeStation);
+			    	City.buildings.add(policeStation);
 			    	}
 				}
 	        	
@@ -362,7 +386,7 @@ public class CityRenderer {
 				    
 			    	powerStation.createShape();
 			    	powerStation.createCollisionShape();
-			    	city.buildings.add(powerStation);
+			    	City.buildings.add(powerStation);
 			    	}
 				}
 				
@@ -397,7 +421,7 @@ public class CityRenderer {
 	        	    
 	        	      hospital.createShape();
 	        	      hospital.createCollisionShape();
-		        	city.buildings.add(hospital);
+		        	City.buildings.add(hospital);
 		        	}
 	        	}
 				
@@ -430,10 +454,74 @@ public class CityRenderer {
 	        	    
 	        	      bank.createShape();
 	        	      bank.createCollisionShape();
-	        	      city.buildings.add(bank);
+	        	      City.buildings.add(bank);
 		        	}
 	        	}
 	        	
+				if(GameScreen.redactorState == GameScreen.BUILD_BAR) {
+		        	if( (col >= 0 && col < 100) && (row >= 0 && row < 100) ) {	
+
+	        		 int barWidth = 2, barLength = 2;
+	        	      StaticTiledMapTile[] tiles = new StaticTiledMapTile[4];
+	        	      tiles[0] = new StaticTiledMapTile(Assets.barCell3);
+	        	      tiles[1] = new StaticTiledMapTile(Assets.barCell4);
+	        	      tiles[2] = new StaticTiledMapTile(Assets.barCell1);
+	        	      tiles[3] = new StaticTiledMapTile(Assets.barCell2);
+	        	      Bar bar = null;
+	        	      if (row == 99 && col == 99) {
+	        	    	  bar = new Bar(row - 1, col - 1);
+		        	    	addToTiledMap(row - 1, col - 1, barWidth, barLength, tiles, layer, bar);
+		        	    	
+	        	      } else if (row == 99) {
+	        	    	  bar = new Bar(row - 1, col);
+	        	    	addToTiledMap(row - 1, col, barWidth, barLength, tiles, layer, bar);
+	        	    	
+	        	    } else if (col == 99) {
+	        	    	bar = new Bar(row, col - 1);
+	        	    	addToTiledMap(row, col - 1, barWidth, barLength, tiles, layer, bar);
+	        	   
+	        	    } else {
+	        	    	bar = new Bar(row, col);
+	        	    	addToTiledMap(row, col, barWidth, barLength, tiles, layer, bar);
+	        	    }
+	        	    
+	        	      bar.createShape();
+	        	      bar.createCollisionShape();
+	        	      City.buildings.add(bar);
+		        	}
+	        	}
+				
+				if(GameScreen.redactorState == GameScreen.BUILD_GROCERY_SHOP) {
+		        	if( (col >= 0 && col < 100) && (row >= 0 && row < 100) ) {	
+
+	        		 int groceryShopWidth = 1, groceryShopLength = 2;
+	        	      StaticTiledMapTile[] tiles = new StaticTiledMapTile[2];
+	        	      tiles[0] = new StaticTiledMapTile(Assets.groceryShopCell1);
+	        	      tiles[1] = new StaticTiledMapTile(Assets.groceryShopCell2);
+	        	      GroceryShop groceryShop = null;
+	        	      if (row == 99 && col == 99) {
+	        	    	  groceryShop = new GroceryShop(row - 1, col - 1);
+		        	    	addToTiledMap(row - 1, col - 1, groceryShopWidth, groceryShopLength, tiles, layer, groceryShop);
+		        	    	
+	        	      } else if (row == 99) {
+	        	    	  groceryShop = new GroceryShop(row - 1, col);
+	        	    	addToTiledMap(row - 1, col, groceryShopWidth, groceryShopLength, tiles, layer, groceryShop);
+	        	    	
+	        	    } else if (col == 99) {
+	        	    	groceryShop = new GroceryShop(row, col - 1);
+	        	    	addToTiledMap(row, col - 1, groceryShopWidth, groceryShopLength, tiles, layer, groceryShop);
+	        	   
+	        	    } else {
+	        	    	groceryShop = new GroceryShop(row, col);
+	        	    	addToTiledMap(row, col, groceryShopWidth, groceryShopLength, tiles, layer, groceryShop);
+	        	    }
+	        	    
+	        	      groceryShop.createShape();
+	        	      groceryShop.createCollisionShape();
+	        	      City.buildings.add(groceryShop);
+		        	}
+	        	}
+				
 				if(GameScreen.redactorState == GameScreen.BUILD_WATERSTATION) {
 		        	if( (col >= 0 && col < 100) && (row >= 0 && row < 100) ) {	
 
@@ -445,7 +533,7 @@ public class CityRenderer {
 	        		addToTiledMap(row, col, waterStationWidth, waterStationHeight, tiles, layer, waterStation);
 	        		waterStation.createShape();
 	        		waterStation.createCollisionShape();
-		        	city.buildings.add(waterStation);
+		        	City.buildings.add(waterStation);
 		        	}
 	        	}
 				
@@ -480,7 +568,7 @@ public class CityRenderer {
 	        	    
 	        	      cityHall.createShape();
 	        	      cityHall.createCollisionShape();
-		        	city.buildings.add(cityHall);
+		        	  City.buildings.add(cityHall);
 		        	}
 	        	}
 				

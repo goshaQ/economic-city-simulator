@@ -87,8 +87,81 @@ public class BuildingRedactorWindow extends Group {
 		}
 	}
 	
+
+	public class GroceryShopRedactor extends Actor {
+		Texture texture1 = new Texture(Gdx.files.internal("data/groceryShopRedactor.png"));
+	
+		boolean started = false;
+		public GroceryShopRedactor() {
+			setWidth(texture1.getWidth());
+			setHeight(texture1.getHeight());
+			setBounds(0, 0, getWidth(), getHeight());
+			setOrigin(getX(), getY());
+			setTouchable(Touchable.enabled);
+			addListener(new InputListener() {
+				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+					((GroceryShopRedactor)event.getTarget()).started = true;
+					return true;
+				}
+			});
+		}
+		
+		@Override 
+		public void draw(Batch batch, float parentAlpha) {
+			 batch.setColor(1, 1, 1, parentAlpha);
+			batch.draw(texture1, getX(), getY());
+		}
+		
+		@Override
+		public void act(float delta) {
+			if(started) {
+				GameScreen.state = GameScreen.GAME_REDACTOR_MODE;
+				GameScreen.redactorState = GameScreen.BUILD_GROCERY_SHOP;
+				Hud.redactorActor.remove();
+				Hud.redactorStep = 0;
+				started = false;
+			}
+		}
+	}
+	
+	public class BarRedactor extends Actor {
+		Texture texture1 = new Texture(Gdx.files.internal("data/barRedactor.png"));
+	
+		boolean started = false;
+		public BarRedactor() {
+			setWidth(texture1.getWidth());
+			setHeight(texture1.getHeight());
+			setBounds(0, 0, getWidth(), getHeight());
+			setOrigin(getX(), getY());
+			setTouchable(Touchable.enabled);
+			addListener(new InputListener() {
+				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+					((BarRedactor)event.getTarget()).started = true;
+					return true;
+				}
+			});
+		}
+		
+		@Override 
+		public void draw(Batch batch, float parentAlpha) {
+			 batch.setColor(1, 1, 1, parentAlpha);
+			batch.draw(texture1, getX(), getY());
+		}
+		
+		@Override
+		public void act(float delta) {
+			if(started) {
+				GameScreen.state = GameScreen.GAME_REDACTOR_MODE;
+				GameScreen.redactorState = GameScreen.BUILD_BAR;
+				Hud.redactorActor.remove();
+				Hud.redactorStep = 0;
+				started = false;
+			}
+		}
+	}
+	
 	public class PowerStationRedactor extends Actor {
-		Texture texture1 = new Texture(Gdx.files.internal("data/powerStation_redactor.png"));
+		Texture texture1 = new Texture(Gdx.files.internal("data/powerStationRedactor.png"));
 	
 		boolean started = false;
 		public PowerStationRedactor() {
@@ -124,7 +197,7 @@ public class BuildingRedactorWindow extends Group {
 	}
 	
 	public class PoliceStationRedactor extends Actor {
-		Texture texture1 = new Texture(Gdx.files.internal("data/policeStation_redactor.png"));
+		Texture texture1 = new Texture(Gdx.files.internal("data/policeStationRedactor.png"));
 	
 		boolean started = false;
 		public PoliceStationRedactor() {

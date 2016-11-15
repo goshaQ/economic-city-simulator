@@ -50,7 +50,17 @@ public class FireStation extends Building {
 	public void update() {
 		updateSelected();
 	}
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		this.electricityBill = electricityBill;
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		this.waterBill = waterBill;
+	}
+
 	public void updateSelected() {
 		if(state == FIRE_STATION_SELECTED) {
 			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
@@ -107,7 +117,7 @@ public class FireStation extends Building {
 	public void showInfo(float screenX, float screenY) {
 		// to implement
 		//Hud.stage.addActor(new BuildingInformationWindow());
-		this.firefighters.add(new Citizen());
+		//this.firefighters.add(new Citizen());
 		Hud.setInformationScreen(this, screenX, screenY);
 		System.out.println("It is a FIRESTATION!!");
 	}

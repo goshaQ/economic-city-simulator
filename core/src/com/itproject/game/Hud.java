@@ -136,6 +136,8 @@ public class Hud {
 		BuildingRedactorWindow.PoliceStationRedactor police = window.new PoliceStationRedactor();
 		BuildingRedactorWindow.PowerStationRedactor power = window.new PowerStationRedactor();
 		BuildingRedactorWindow.WaterStationRedactor water = window.new WaterStationRedactor();
+		BuildingRedactorWindow.GroceryShopRedactor grocery = window.new GroceryShopRedactor();
+		BuildingRedactorWindow.BarRedactor bar = window.new BarRedactor();
 		
 		//fire.setOrigin(0, 0);
 	
@@ -230,7 +232,17 @@ public class Hud {
 		redactorMenuContent.row().height(20f);
 		redactorMenuContent.add();
 		redactorMenuContent.row();
-		
+		redactorMenuContent.add(new Label("Grocery Shop" , new Label.LabelStyle(new BitmapFont(), Color.BLACK)));
+		redactorMenuContent.add(new Label("Bar" , new Label.LabelStyle(new BitmapFont(), Color.BLACK)));
+		redactorMenuContent.row();
+		redactorMenuContent.add(grocery).uniform();
+		redactorMenuContent.add(bar).uniform();
+		redactorMenuContent.row();
+		redactorMenuContent.add(new Label(String.format("$%d", 150000), new Label.LabelStyle(new BitmapFont(), Color.WHITE)));
+		redactorMenuContent.add(new Label(String.format("$%d", 300000), new Label.LabelStyle(new BitmapFont(), Color.WHITE)));
+		redactorMenuContent.row().height(20f);
+		redactorMenuContent.add();
+		redactorMenuContent.row();
 		
 				
 		Table bottomHud = new Table();

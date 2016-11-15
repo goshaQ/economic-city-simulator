@@ -34,9 +34,14 @@ public class GameScreen extends ScreenAdapter {
 	static final int BUILD_BANK = 5;
 	static final int BUILD_CITYHALL = 6;
 	static final int BUILD_WATERSTATION= 7;
-	static final int BUILD_OFF = 8;
-	
-	
+	static final int BUILD_GROCERY_SHOP = 8;
+	static final int BUILD_BAR = 9;
+	static final int BUILD_WTC = 10;
+	static final int BUILD_PARK = 11;
+	static final int BUILD_ROAD = 12;
+	static final int BUILD_OIL_PLANT = 13;
+	static final int BUILD_IRON_PLANT = 14;
+	static final int BUILD_OFF = 15;
 	
 	public static City city;
 	CityListener cityListener;
@@ -86,32 +91,14 @@ public class GameScreen extends ScreenAdapter {
 	public void render(float delta) {
 		//delta = Math.min(0.06f, Gdx.graphics.getDeltaTime());
 		update(delta);
-		
 		multi.addProcessor(Hud.stage);
-
-		//Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-		
-		Gdx.gl.glClearColor(0.5f, 0.75f, 1, 1);		
-		
-		  Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-	
-	   
-	    
+		Gdx.gl.glClearColor(0.5f, 0.75f, 1, 1);			
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		renderer.render(delta);
-		
-	
 		guiCam.update();
 		game.batcher.setProjectionMatrix(Hud.stage.getCamera().combined);
 		Hud.stage.act(Gdx.graphics.getDeltaTime());
 		Hud.stage.draw();
-	/*	game.batcher.setProjectionMatrix(guiCam.combined);
-		game.batcher.enableBlending();
-		game.batcher.begin();
-		game.batcher.draw(Assets.demoRedactorMenu, 1920 - 300, 1080 - 200, 300, 200);
-		game.batcher.draw(Assets.demoBlock, 1920 - 80 - 64 - 5, 1080 - 25 - 64, 64, 64);
-		game.batcher.draw(Assets.demoHouseRedactor, 1920 - 64 - 11 - 5, 1080 - 25 - 64, 64, 64);
-		game.batcher.draw(Assets.fireStationRedactorRegion, 1920 - 80 - 64 - 10 - 64, 1080 - 25 - 64, 64, 64);
-		game.batcher.end();*/
 			
 		//  Gdx.gl.glEnable(GL20.GL_BLEND);
 		//  Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);

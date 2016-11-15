@@ -2,44 +2,40 @@ package com.itproject.game.buildings;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
 
-public class PoliceStation extends Building{
-
+public class IronPlant extends Building {
+	
 	public static final int TILE_HEIGHT = 32;
 	public static final int TILE_WIDTH = 64;	
-	public static final int POLICE_STATION_OK = 0;
-	public static final int POLICE_STATION_ON_FIRE = 1;
-	public static final int POLICE_STATION_SELECTED = 2;
-	public static final int POLICE_STATION_UNSELECTED = 3;
-	public static final int POLICE_STATION_DESTROYED = 4;
-	public static final int POLICE_STATION_HEIGHT = 2;
-	public static final int POLICE_STATION_WIDTH = 2;
-
-
+	public static final int IRON_PLANT_OK = 0;
+	public static final int IRON_PLANT_ON_FIRE = 1;
+	public static final int IRON_PLANT_SELECTED = 2;
+	public static final int IRON_PLANT_UNSELECTED = 3;
+	public static final int IRON_PLANT_DESTROYED = 4;
+	public static final int IRON_PLANT_HEIGHT = 3;
+	public static final int IRON_PLANT_WIDTH = 3;
 	
 	TiledMapTileLayer.Cell[] cell;
 	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> firefighters;
+	List<Citizen> lords;
 	TiledMapTileLayer layer;
 	  
-	public PoliceStation(int row, int col) {
-		super(5000, 300);
+	public IronPlant(int row, int col) {
+		super(10000, 500);
 		
 		state = 0;
 		
 		this.col = col;
 		this.row = row;
 		cell = new TiledMapTileLayer.Cell[6];
-		firefighters = new ArrayList<Citizen>(10); // default 10 policemen at start
+		lords = new ArrayList<Citizen>(10); // default 10 firefighters at start
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
 	}
 	
@@ -58,8 +54,8 @@ public class PoliceStation extends Building{
 	}
 
 	public void updateSelected() {
-		if(state == POLICE_STATION_SELECTED) {
-			/*cell[0] = layer.getCell(row, col);
+		/*if(state == IRON_PLANT_SELECTED) {
+			cell[0] = layer.getCell(row, col);
 			cell[1] = layer.getCell(row + 1, col);
 			cell[2] = layer.getCell(row, col + 1);
 			cell[3] = layer.getCell(row + 1, col + 1);
@@ -71,23 +67,21 @@ public class PoliceStation extends Building{
 			cell[2].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
 			cell[3].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
 			cell[4].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));*/
-		} else if(state == POLICE_STATION_UNSELECTED) {
+			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));
+		} else if(state == IRON_PLANT_UNSELECTED) {
 	
-			/*cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
+			cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
 			cell[1].setTile(new StaticTiledMapTile(Assets.fireStationCell6));
 			cell[2].setTile(new StaticTiledMapTile(Assets.fireStationCell3));
 			cell[3].setTile(new StaticTiledMapTile(Assets.fireStationCell4));
 			cell[4].setTile(new StaticTiledMapTile(Assets.fireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));*/
+			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));
 			
-			state = POLICE_STATION_OK;
-		}
+			state = IRON_PLANT_OK;
+		}*/
 	}
 	
 	public void createShape() {
-		this.col = col; 
-		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
 	    float[] vertices = new float[12];
@@ -119,6 +113,11 @@ public class PoliceStation extends Building{
 	public int getRow() {
 		return row;
 	}
+	
+	public void showInfo(float screenX, float screenY) {
+		// to implement
+		System.out.println("It is a IRON_PLANT!!");
+	}
 
 	@Override
 	public void createCollisionShape() {
@@ -130,12 +129,6 @@ public class PoliceStation extends Building{
 	public Polygon getCollisionShape() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void showInfo(float screenX, float screenY) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -158,7 +151,6 @@ public class PoliceStation extends Building{
 
 	@Override
 	public boolean isPowered() {
-		// TODO Auto-generated method stub
 		return isPowered;
 	}
 
@@ -170,13 +162,13 @@ public class PoliceStation extends Building{
 	@Override
 	public int getHeight() {
 		// TODO Auto-generated method stub
-		return POLICE_STATION_HEIGHT;
+		return IRON_PLANT_HEIGHT;
 	}
 
 	@Override
 	public int getWidth() {
 		// TODO Auto-generated method stub
-		return POLICE_STATION_WIDTH;
+		return IRON_PLANT_WIDTH;
 	}
 	
 	

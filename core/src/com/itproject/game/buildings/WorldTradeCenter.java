@@ -45,7 +45,17 @@ public class WorldTradeCenter extends Building {
 	public void update() {
 		updateSelected();
 	}
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		this.electricityBill = electricityBill;
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		this.waterBill = waterBill;
+	}
+
 	public void updateSelected() {
 		/*if(state == WTC_SELECTED) {
 			cell[0] = layer.getCell(row, col);
