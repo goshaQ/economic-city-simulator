@@ -21,33 +21,43 @@ public class Assets {
 	public static TextureRegion greenDemoBlock;
 	public static TextureRegion demoGrass;
 	
+	// FIRESTATION
 	public static Texture fireStation;
 	public static TextureRegion fireStationCell1;
 	public static TextureRegion fireStationCell2;
 	public static TextureRegion fireStationCell3;
 	public static TextureRegion fireStationCell4;
-
 	public static Texture fireStationSelected;
 	public static TextureRegion selectedFireStationCell1;
 	public static TextureRegion selectedFireStationCell2;
 	public static TextureRegion selectedFireStationCell3;
 	public static TextureRegion selectedFireStationCell4;
-
 	public static Texture fireStationGreen;
 	public static TextureRegion fireStationGreenCell1;
 	public static TextureRegion fireStationGreenCell2;
 	public static TextureRegion fireStationGreenCell3;
 	public static TextureRegion fireStationGreenCell4;
-
+	public static Texture fireStationRedactor;
+	public static TextureRegion fireStationRedactorRegion;
+	// POLICESTATION
 	public static Texture policeStation;
 	public static TextureRegion policeStationCell1;
 	public static TextureRegion policeStationCell2;
 	public static TextureRegion policeStationCell3;
 	public static TextureRegion policeStationCell4;
+	public static Texture policeStationSelected;
+	public static TextureRegion policeStationSelectedCell1;
+	public static TextureRegion policeStationSelectedCell2;
+	public static TextureRegion policeStationSelectedCell3;
+	public static TextureRegion policeStationSelectedCell4;
+	public static Texture policeStationGreen;
+	public static TextureRegion policeStationGreenCell1;
+	public static TextureRegion policeStationGreenCell2;
+	public static TextureRegion policeStationGreenCell3;
+	public static TextureRegion policeStationGreenCell4;
 	public static Texture policeStationRedactor;
 	public static TextureRegion policeStationRedactorRegion;
-
-	
+	// HOSPITAL
 	public static Texture hospital;
 	public static TextureRegion hospitalCell1;
 	public static TextureRegion hospitalCell2;
@@ -55,9 +65,6 @@ public class Assets {
 	public static TextureRegion hospitalCell4;
 	public static TextureRegion hospitalCell5;
 	public static TextureRegion hospitalCell6;
-	public static Texture hospitalRedactor;
-	public static TextureRegion hospitalRedactorRegion;
-
 	public static Texture hospitalSelected;
 	public static TextureRegion hospitalSelectedCell1;
 	public static TextureRegion hospitalSelectedCell2;
@@ -65,7 +72,9 @@ public class Assets {
 	public static TextureRegion hospitalSelectedCell4;
 	public static TextureRegion hospitalSelectedCell5;
 	public static TextureRegion hospitalSelectedCell6;
-	
+	public static Texture hospitalRedactor;
+	public static TextureRegion hospitalRedactorRegion;
+	// BANK
 	public static Texture bank;
 	public static TextureRegion bankCell1;
 	public static TextureRegion bankCell2;
@@ -83,7 +92,7 @@ public class Assets {
 	public static TextureRegion bankGreenCell4;
 	public static Texture bankRedactor;
 	public static TextureRegion bankRedactorRegion;
-
+	// GROCERY SHOP
 	public static Texture groceryShop;
 	public static TextureRegion groceryShopCell1;
 	public static TextureRegion groceryShopCell2;
@@ -95,7 +104,7 @@ public class Assets {
 	public static TextureRegion groceryShopGreenCell2;
 	public static Texture groceryShopRedactor;
 	public static TextureRegion groceryShopRedactorRegion;
-
+	// BAR
 	public static Texture bar;
 	public static TextureRegion barCell1;
 	public static TextureRegion barCell2;
@@ -113,7 +122,7 @@ public class Assets {
 	public static TextureRegion barGreenCell4;
 	public static Texture barRedactor;
 	public static TextureRegion barRedactorRegion;
-	
+	// POWER STATION
 	public static Texture powerStation;
 	public static TextureRegion powerStationCell1;
 	public static TextureRegion powerStationCell2;
@@ -124,12 +133,35 @@ public class Assets {
 	public static TextureRegion powerStationCell7;
 	public static TextureRegion powerStationCell8;
 	public static TextureRegion powerStationCell9;
+	public static Texture powerStationSelected;
+	public static TextureRegion powerStationSelectedCell1;
+	public static TextureRegion powerStationSelectedCell2;
+	public static TextureRegion powerStationSelectedCell3;
+	public static TextureRegion powerStationSelectedCell4;
+	public static TextureRegion powerStationSelectedCell5;
+	public static TextureRegion powerStationSelectedCell6;
+	public static TextureRegion powerStationSelectedCell7;
+	public static TextureRegion powerStationSelectedCell8;
+	public static TextureRegion powerStationSelectedCell9;
+	public static Texture powerStationGreen;
+	public static TextureRegion powerStationGreenCell1;
+	public static TextureRegion powerStationGreenCell2;
+	public static TextureRegion powerStationGreenCell3;
+	public static TextureRegion powerStationGreenCell4;
+	public static TextureRegion powerStationGreenCell5;
+	public static TextureRegion powerStationGreenCell6;
+	public static TextureRegion powerStationGreenCell7;
+	public static TextureRegion powerStationGreenCell8;
+	public static TextureRegion powerStationGreenCell9;
 	public static Texture powerStationRedactor;
 	public static TextureRegion powerStationRedactorRegion;
-
+	// WATER STATION
 	public static Texture waterStation;
 	public static TextureRegion waterStationRegion;
-
+	public static Texture waterStationSelected;
+	public static TextureRegion waterStationSelectedCell;
+	public static Texture waterStationGreen;
+	public static TextureRegion waterStationGreenCell;
 
 	public static Texture cityHall;
 	public static TextureRegion cityHallCell1;
@@ -141,9 +173,7 @@ public class Assets {
 	public static Texture cityHallRedactor;
 	public static TextureRegion cityHallRedactorRegion;
 	
-	public static Texture fireStationRedactor;
-	public static TextureRegion fireStationRedactorRegion;
-	
+
 	public static Texture redactorMenu;
 	public static TextureRegion demoRedactorMenu;
 	
@@ -163,6 +193,8 @@ public class Assets {
 	static StaticTiledMapTile[] bankGreenTiles;
 	static StaticTiledMapTile[] groceryShopGreenTiles;
 	static StaticTiledMapTile[] barGreenTiles;
+	static StaticTiledMapTile[] powerStationGreenTiles;
+	static StaticTiledMapTile[] policeStationGreenTiles;
 	
 	
 	public static void load() {
@@ -274,37 +306,78 @@ public class Assets {
 		powerStationCell7 = new TextureRegion(powerStation, 0, 192, 64, 96);
 		powerStationCell8 = new TextureRegion(powerStation, 64, 192, 64, 96);
 		powerStationCell9 = new TextureRegion(powerStation, 128, 192, 64, 96);
+		powerStationSelected = loadTexture("data/powerStationSelected.png");
+		powerStationSelectedCell1 = new TextureRegion(powerStationSelected, 0, 0, 64, 96);
+		powerStationSelectedCell2 = new TextureRegion(powerStationSelected, 64, 0, 64, 96);
+		powerStationSelectedCell3 = new TextureRegion(powerStationSelected, 128, 0, 64, 96);
+		powerStationSelectedCell4 = new TextureRegion(powerStationSelected, 0, 96, 64, 96);
+		powerStationSelectedCell5 = new TextureRegion(powerStationSelected, 64, 96, 64, 96);
+		powerStationSelectedCell6 = new TextureRegion(powerStationSelected, 128, 96, 64, 96);
+		powerStationSelectedCell7 = new TextureRegion(powerStationSelected, 0, 192, 64, 96);
+		powerStationSelectedCell8 = new TextureRegion(powerStationSelected, 64, 192, 64, 96);
+		powerStationSelectedCell9 = new TextureRegion(powerStationSelected, 128, 192, 64, 96);
+		powerStationGreen = loadTexture("data/powerStationGreen.png");
+		powerStationGreenCell1 = new TextureRegion(powerStationGreen, 0, 0, 64, 96);
+		powerStationGreenCell2 = new TextureRegion(powerStationGreen, 64, 0, 64, 96);
+		powerStationGreenCell3 = new TextureRegion(powerStationGreen, 128, 0, 64, 96);
+		powerStationGreenCell4 = new TextureRegion(powerStationGreen, 0, 96, 64, 96);
+		powerStationGreenCell5 = new TextureRegion(powerStationGreen, 64, 96, 64, 96);
+		powerStationGreenCell6 = new TextureRegion(powerStationGreen, 128, 96, 64, 96);
+		powerStationGreenCell7 = new TextureRegion(powerStationGreen, 0, 192, 64, 96);
+		powerStationGreenCell8 = new TextureRegion(powerStationGreen, 64, 192, 64, 96);
+		powerStationGreenCell9 = new TextureRegion(powerStationGreen, 128, 192, 64, 96);
 		powerStationRedactor = loadTexture("data/powerStationRedactor.png");
 		powerStationRedactorRegion = new TextureRegion(powerStationRedactor);
+		powerStationGreenTiles = new StaticTiledMapTile[9];
+		powerStationGreenTiles[0] = new StaticTiledMapTile(Assets.powerStationGreenCell7);
+		powerStationGreenTiles[1] = new StaticTiledMapTile(Assets.powerStationGreenCell8);
+		powerStationGreenTiles[2] = new StaticTiledMapTile(Assets.powerStationGreenCell9);
+		powerStationGreenTiles[3] = new StaticTiledMapTile(Assets.powerStationGreenCell4);
+		powerStationGreenTiles[4] = new StaticTiledMapTile(Assets.powerStationGreenCell5);
+		powerStationGreenTiles[5] = new StaticTiledMapTile(Assets.powerStationGreenCell6);
+		powerStationGreenTiles[6] = new StaticTiledMapTile(Assets.powerStationGreenCell1);
+		powerStationGreenTiles[7] = new StaticTiledMapTile(Assets.powerStationGreenCell2);
+		powerStationGreenTiles[8] = new StaticTiledMapTile(Assets.powerStationGreenCell3);
 
-
+		
 		waterStation = loadTexture("data/waterStation.png");
 		waterStationRegion = new TextureRegion(waterStation);
 
 		policeStationRedactor = loadTexture("data/policeStationRedactor.png");
-
 		policeStationRedactorRegion = new TextureRegion(policeStationRedactor);
 		policeStation = loadTexture("data/policeStation.png");
 		policeStationCell1 = new TextureRegion(policeStation, 0, 0, 64, 96);
 		policeStationCell2 = new TextureRegion(policeStation, 64, 0, 64, 96);
 		policeStationCell3 = new TextureRegion(policeStation, 0, 96, 64, 96);
 		policeStationCell4 = new TextureRegion(policeStation, 64, 96, 64, 96);
+		policeStationSelected = loadTexture("data/policeStationSelected.png");
+		policeStationSelectedCell1 = new TextureRegion(policeStationSelected, 0, 0, 64, 96);
+		policeStationSelectedCell2 = new TextureRegion(policeStationSelected, 64, 0, 64, 96);
+		policeStationSelectedCell3 = new TextureRegion(policeStationSelected, 0, 96, 64, 96);
+		policeStationSelectedCell4 = new TextureRegion(policeStationSelected, 64, 96, 64, 96);
+		policeStationGreen = loadTexture("data/policeStationGreen.png");
+		policeStationGreenCell1 = new TextureRegion(policeStationGreen, 0, 0, 64, 96);
+		policeStationGreenCell2 = new TextureRegion(policeStationGreen, 64, 0, 64, 96);
+		policeStationGreenCell3 = new TextureRegion(policeStationGreen, 0, 96, 64, 96);
+		policeStationGreenCell4 = new TextureRegion(policeStationGreen, 64, 96, 64, 96);
+		policeStationGreenTiles = new StaticTiledMapTile[4];
+		policeStationGreenTiles[0] = new StaticTiledMapTile(policeStationGreenCell3);
+		policeStationGreenTiles[1] = new StaticTiledMapTile(policeStationGreenCell4);
+		policeStationGreenTiles[2] = new StaticTiledMapTile(policeStationGreenCell1);
+		policeStationGreenTiles[3] = new StaticTiledMapTile(policeStationGreenCell2);
 		
 		fireStationRedactor = loadTexture("data/fireStation_redactor.png");
 		fireStationRedactorRegion = new TextureRegion(fireStationRedactor);
-		
 		fireStation = loadTexture("data/fireStation.png");
 		fireStationCell1 = new TextureRegion(fireStation, 0, 0, 64, 96);
 		fireStationCell2 = new TextureRegion(fireStation, 64, 0, 64, 96);
 		fireStationCell3 = new TextureRegion(fireStation, 0, 96, 64, 96);
 		fireStationCell4 = new TextureRegion(fireStation, 64, 96, 64, 96);
-		
 		fireStationSelected = loadTexture("data/fireStationSelected.png");
 		selectedFireStationCell1 = new TextureRegion(fireStationSelected, 0, 0, 64, 96);
 		selectedFireStationCell2 = new TextureRegion(fireStationSelected, 64, 0, 64, 96);
 		selectedFireStationCell3 = new TextureRegion(fireStationSelected, 0, 96, 64, 96);
 		selectedFireStationCell4 = new TextureRegion(fireStationSelected, 64, 96, 64, 96);
-
 		fireStationGreen = loadTexture("data/fireStationGreen.png");
 		fireStationGreenCell1 = new TextureRegion(fireStationGreen, 0, 0, 64, 96);
 		fireStationGreenCell2 = new TextureRegion(fireStationGreen, 64, 0, 64, 96);

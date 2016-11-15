@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.Hud;
 
 public class WorldTradeCenter extends Building {
 
@@ -121,6 +122,7 @@ public class WorldTradeCenter extends Building {
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		Hud.setInformationScreen(this, screenX, screenY);
 		System.out.println("It is a WTC!!");
 	}
 

@@ -187,6 +187,33 @@ public class CityRenderer {
 					} 
 				}
 				
+				if(GameScreen.redactorState == GameScreen.BUILD_POLICESTATION) {
+					if( (col >= 0 && col < 99) && (row >= 0 && row < 99) ) {	
+						if(lastRow != -10000 && lastCol != -10000) {
+							if(Math.abs(lastRow - row) != 0 || Math.abs(lastCol - col) != 0) {
+									tempTiles = buildGreen(row, col, lastRow, lastCol, PoliceStation.POLICE_STATION_WIDTH, PoliceStation.POLICE_STATION_HEIGHT, tempTiles, Assets.policeStationGreenTiles, layer);
+							}
+						} else {	
+							tempTiles = buildGreen(row, col, lastRow, lastCol, PoliceStation.POLICE_STATION_WIDTH, PoliceStation.POLICE_STATION_HEIGHT, tempTiles, Assets.policeStationGreenTiles, layer);
+						}				
+						lastRow = row; lastCol = col;
+					} 
+				}
+				
+				
+				if(GameScreen.redactorState == GameScreen.BUILD_POWERSTATION) {
+					if( (col >= 0 && col < 99) && (row >= 0 && row < 99) ) {	
+						if(lastRow != -10000 && lastCol != -10000) {
+							if(Math.abs(lastRow - row) != 0 || Math.abs(lastCol - col) != 0) {
+									tempTiles = buildGreen(row, col, lastRow, lastCol, PowerStation.POWER_STATION_WIDTH, PowerStation.POWER_STATION_HEIGHT, tempTiles, Assets.powerStationGreenTiles, layer);
+							}
+						} else {	
+							tempTiles = buildGreen(row, col, lastRow, lastCol, PowerStation.POWER_STATION_WIDTH, PowerStation.POWER_STATION_HEIGHT, tempTiles, Assets.powerStationGreenTiles, layer);
+						}				
+						lastRow = row; lastCol = col;
+					} 
+				}
+				
 				if(GameScreen.redactorState == GameScreen.BUILD_BANK) {
 					if( (col >= 0 && col < 99) && (row >= 0 && row < 99) ) {	
 						if(lastRow != -10000 && lastCol != -10000) {

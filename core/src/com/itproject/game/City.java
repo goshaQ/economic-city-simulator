@@ -60,7 +60,7 @@ public class City {
 		this.worldview = new Worldview(this);
 		this.budget = new Budget(this);
 		City.time = new Time();
-
+		
 		// Create map generation later
 		// generateMap();
 
@@ -94,161 +94,13 @@ public class City {
         checkGameOver();
 	}
 
-	public void loadStatistics() {
-		try {
-			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = builderFactory.newDocumentBuilder();
-			Document document = builder.parse("statistics.xml");
-
-			Node root = document.getDocumentElement();
-			NodeList childNodes = root.getChildNodes();
-
-			Node node;
-
-			float[][] statistics = new float[4][];
-			statistics[0] = birthStatistics;
-			statistics[1] = procreateStatistics;
-			statistics[2] = deathStatistics;
-			statistics[3] = expensesStatistics;
-
-			for (int i = 0; i < childNodes.getLength(); i++) {
-				node = childNodes.item(i);
-				if (node.getTextContent().trim().equals("")) {
-					node.getParentNode().removeChild(node);
-					i--;
-				} else {
-					NodeList statisticsData = node.getChildNodes();
-					for (int j = 0; j < statisticsData.getLength(); j++) {
-						node = statisticsData.item(j);
-						if (node.getTextContent().trim().equals("")) {
-							node.getParentNode().removeChild(node);
-							j--;
-						} else {
-							statistics[i][j] = Float.parseFloat(node.getTextContent());
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace(System.out);
-		}
-	}
-
-	private void updatePopulation() {
-		List<Citizen> newCitizens = new ArrayList<>();
-
-        Citizen firstParent = null;
-		Citizen secondParent = null;
-
-		int throwDie;
-		short moneyForChild = 0;
-		float happinessContribution = 0;
-
-		Iterator<Citizen> citizen = citizens.iterator();
-		while (citizen.hasNext()) {
-			if (citizen.hasNext()) {
-				firstParent = citizen.next();
-			}
-
-			if (citizen.hasNext()) {
-				secondParent = citizen.next();
-			}
-
-			if ( (firstParent != null && secondParent != null) &&
-					(firstParent.isReadyToProcreate && secondParent.isReadyToProcreate)) {
-                if (firstParent.happinessLevel > 60 && secondParent.happinessLevel > 60) {
-					happinessContribution = ((firstParent.happinessLevel - 60) + (secondParent.happinessLevel - 60)) / 10000;
-					procreateStatistics[1] += happinessContribution;
-				} else if (firstParent.happinessLevel < 45 && secondParent.happinessLevel < 45) {
-					happinessContribution = ((45 - firstParent.happinessLevel) + (45 - secondParent.happinessLevel)) / -10000;
-					procreateStatistics[1] += happinessContribution;
-				}
-
-				throwDie = BPRNG.nextByte(procreateStatistics, (short)1000);
-                if (throwDie == 1) {
-					throwDie = BPRNG.nextByte(birthStatistics, (short)100);
-					if (throwDie == 0) {
-						if (firstParent.moneySavings - 1200 >= 0) {
-							firstParent.moneySavings -= 1200;
-							moneyForChild += 1200;
-						} else {
-							moneyForChild += (short) firstParent.moneySavings;
-							firstParent.moneySavings = 0;
-						}
-
-						if (secondParent.moneySavings - 1200 >= 0) {
-							secondParent.moneySavings -= 1200;
-							moneyForChild += 1200;
-						} else {
-							moneyForChild += (short) secondParent.moneySavings;
-							secondParent.moneySavings = 0;
-						}
-
-						newCitizens.add(new Citizen(worldview.determineType(), moneyForChild));
-					} else {
-						if (firstParent.moneySavings - 2400 >= 0) {
-							firstParent.moneySavings -= 2400;
-							moneyForChild += 1200;
-						} else {
-							moneyForChild += (short) (firstParent.moneySavings >> 1);
-							firstParent.moneySavings = 0;
-						}
-
-						if (secondParent.moneySavings - 2400 >= 0) {
-							secondParent.moneySavings -= 2400;
-							moneyForChild += 1200;
-						} else {
-							moneyForChild += (short) (secondParent.moneySavings >> 1);
-							secondParent.moneySavings = 0;
-						}
-
-						newCitizens.add(new Citizen(worldview.determineType(), moneyForChild));
-						newCitizens.add(new Citizen(worldview.determineType(), moneyForChild));
-					}
-
-					firstParent.ageOfLastProcreation.concatenateWith(firstParent.age.subtractInterval(firstParent.ageOfLastProcreation));
-                    secondParent.ageOfLastProcreation.concatenateWith(secondParent.age.subtractInterval(secondParent.ageOfLastProcreation));
-					secondParent.isReadyToProcreate = firstParent.isReadyToProcreate = false;
-					moneyForChild = 0;
-				}
-
-				if (happinessContribution != 0) {
-					procreateStatistics[1] = 0.006f;
-					happinessContribution = 0;
-				}
-			}
-
-            firstParent = secondParent = null;
-		}
-
-		citizens.addAll(newCitizens);
-    }
-
-	private void updateCitizens() {
-        List<Citizen> deadCitizens = new ArrayList<>();
-
-		int previousYear;
-        for (Citizen c : citizens) {
-			previousYear = c.age.getYear();
-			c.update();
-
-			if (c.age.getYear() > previousYear || (c.age.getYear() == 0 && c.age.getMonth() == 0 && c.age.getDay() == 7)) {
-                if(!c.isAlive()) {
-					deadCitizens.add(c);
-                }
-            }
-		}
-
-		citizens.removeAll(deadCitizens);
-
-	}
 
 
 	public void loadStatistics() {
 		try {
 			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = builderFactory.newDocumentBuilder();
-			Document document = builder.parse("statistics.xml");
+			Document document = builder.parse("../core/assets/statistics.xml");
 
 			Node root = document.getDocumentElement();
 			NodeList childNodes = root.getChildNodes();
@@ -391,7 +243,6 @@ public class City {
 
 		citizens.removeAll(deadCitizens);
 	}
-
 
 	public void updateTime() {
 		time.nextDay();
@@ -421,4 +272,5 @@ public class City {
 		}
 		return false;
 
+	}	
 }

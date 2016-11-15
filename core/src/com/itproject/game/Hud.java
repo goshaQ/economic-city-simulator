@@ -54,14 +54,7 @@ public class Hud {
 			add(yearValue).expandX();
 			setTouchable(Touchable.enabled);
 			
-		}
-		
-		/*@Override 
-		public void draw(Batch batch, float parentAlpha) {
-			 batch.setColor(1, 1, 1, parentAlpha);
-			batch.draw(texture1, getX(), getY());
-		}*/
-		
+		}	
 		@Override
 		public void act(float delta) {
 			deltaTime += delta;
@@ -74,6 +67,32 @@ public class Hud {
 		}
 	}
 	
+	public class HudBudget extends Table {	
+		float deltaTime = 0;
+		Table timerContent = new Table();
+		Label budget; Label budgetValue;
+		
+		
+		public HudBudget() {
+			budget = new Label("Budget", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+			budgetValue = new Label(String.format("$%03d", City.budget.amountMoney) ,new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+			//setFillParent(true);
+			//debug();
+			add(budget).expandX().padTop(10);
+			row();
+			add(budgetValue).expandX();
+			setTouchable(Touchable.enabled);
+			
+		}	
+		@Override
+		public void act(float delta) {
+			deltaTime += delta;
+			if(deltaTime >= 1f) {
+				budgetValue.setText(String.format("$%03d", City.budget.amountMoney));
+				deltaTime -= 1f;
+			}
+		}
+	}
 	
 	public static int timer;
 	
@@ -332,15 +351,22 @@ public class Hud {
 		//hudTopContent.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture("data/hudTop.png"))));
 		hudTopContent.top();
 		HudTimer timer = new HudTimer();
+		HudBudget budget = new HudBudget();
 		//timer.debug();
 		hudTopContent.add(timer).center();
+		Table budgetHudTop = new Table();
+		budgetHudTop.setFillParent(true);
+		budgetHudTop.top();
+		budgetHudTop.add(budget).right().expandX().padRight(20f);
 		
+
 	
 		Image hudTop = new Image(new Texture("data/hutTopDemo.png"));
 		hudTop.setPosition(0, Gdx.graphics.getHeight() - 80);
 		//.bank.stage.addActor(hudBottom);
 		stage.addActor(hudTop);
 		stage.addActor(hudTopContent);
+		stage.addActor(budgetHudTop);
 		//stage.addActor(table);
 		stage.addActor(bottomHud);
 		
@@ -353,15 +379,15 @@ public class Hud {
 	public static void setInformationScreen(Building building, float screenX, float screenY) {
 		Table buildingInfo = new Table();
 		buildingInfo.setFillParent(true);
-		//buildingInfo.right();
-		buildingInfo.debug();
+		buildingInfo.right().bottom();
+		//buildingInfo.debug();
 		
 		Label people = new Label("People:" , new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 		Label peopleCount = new Label(String.format("%d", building.getPeopleSize()), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 		
 		//Image actor = new Image(new Texture("data/buildingInformationWindow.png"));
 		Table content = new Table();
-		buildingInfo.add(content);
+		buildingInfo.add(content).width(420f).height(400f);
 		//content.setFillParent(true);
 		content.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture("data/buildingInformationWindow.png"))));
 		content.add().expandX();

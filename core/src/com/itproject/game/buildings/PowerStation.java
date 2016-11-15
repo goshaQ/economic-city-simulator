@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
 import com.itproject.game.City;
 import com.itproject.game.GameScreen;
+import com.itproject.game.Hud;
 
 public class PowerStation extends Building{
 
@@ -45,7 +47,7 @@ public class PowerStation extends Building{
 		this.row = row;
 		cell = new TiledMapTileLayer.Cell[6];
 		worker = new ArrayList<Citizen>(10); // default 10 firefighters at start
-		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
+		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 		powerConsumers = new ArrayList<Building>(POWER_CONSUMERS_LIMIT);
 		initializePowerConsumers();
 	}
@@ -65,44 +67,39 @@ public class PowerStation extends Building{
 	}
 
 	public void updateSelected() {
-		/*if(state == POWER_STATION_SELECTED) {
-			cell[0] = layer.getCell(row, col);
-			cell[1] = layer.getCell(row + 1, col);
-			cell[2] = layer.getCell(row, col + 1);
-			cell[3] = layer.getCell(row + 1, col + 1);
-			cell[4] = layer.getCell(row, col + 2);
-			cell[5] = layer.getCell(row + 1, col + 2);
-			
-			cell[0].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));
+		if(state == POWER_STATION_SELECTED) {
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.powerStationSelectedCell7));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.powerStationSelectedCell8));
+			layer.getCell(row + 2, col).setTile(new StaticTiledMapTile(Assets.powerStationSelectedCell9));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.powerStationSelectedCell4));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.powerStationSelectedCell5));
+			layer.getCell(row + 2, col + 1).setTile(new StaticTiledMapTile(Assets.powerStationSelectedCell6));
+			layer.getCell(row, col + 2).setTile(new StaticTiledMapTile(Assets.powerStationSelectedCell1));
+			layer.getCell(row + 1, col + 2).setTile(new StaticTiledMapTile(Assets.powerStationSelectedCell2));
+			layer.getCell(row + 2, col + 2).setTile(new StaticTiledMapTile(Assets.powerStationSelectedCell3));
 		} else if(state == POWER_STATION_UNSELECTED) {
-	
-			cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.fireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.fireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.fireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.fireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));
-			
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.powerStationCell7));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.powerStationCell8));
+			layer.getCell(row + 2, col).setTile(new StaticTiledMapTile(Assets.powerStationCell9));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.powerStationCell4));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.powerStationCell5));
+			layer.getCell(row + 2, col + 1).setTile(new StaticTiledMapTile(Assets.powerStationCell6));
+			layer.getCell(row, col + 2).setTile(new StaticTiledMapTile(Assets.powerStationCell1));
+			layer.getCell(row + 1, col + 2).setTile(new StaticTiledMapTile(Assets.powerStationCell2));
+			layer.getCell(row + 2, col + 2).setTile(new StaticTiledMapTile(Assets.powerStationCell3));
 			state = POWER_STATION_OK;
-		}*/
+		}
 	}
 	
 	public void createShape() {
-		this.col = col; 
-		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
 	    float[] vertices = new float[12];
 	    vertices[0] = screenx;   vertices[1] = screeny;
-	    vertices[2] = screenx + 64; vertices[3] = screeny - 32;
-	    vertices[4] = screenx + 128; vertices[5] = screeny;
-	    vertices[6] = screenx + 128; vertices[7] = screeny + 32;
-	    vertices[8] = screenx + 64; vertices[9] = screeny - 32 + 128;
+	    vertices[2] = screenx + 96; vertices[3] = screeny - 47;
+	    vertices[4] = screenx + 192; vertices[5] = screeny;
+	    vertices[6] = screenx + 192; vertices[7] = screeny + 64;
+	    vertices[8] = screenx + 96; vertices[9] = screeny - 47 + 192;
 	    vertices[10] = screenx; vertices[11] = screeny + 64;
 		shape = new Polygon(vertices);
 	}
@@ -129,6 +126,8 @@ public class PowerStation extends Building{
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		Hud.setInformationScreen(this, screenX, screenY);
+
 		System.out.println("It is a Power Station!!");
 	}
 

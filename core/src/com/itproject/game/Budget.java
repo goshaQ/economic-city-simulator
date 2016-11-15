@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class Budget {
     private final City city;
 
-    int amountMoney;
+    public int amountMoney;
 
     boolean taxationType;
     byte fixedTaxPercentage;
@@ -17,6 +17,7 @@ public class Budget {
 
     public Budget(City city) {
         this.city = city;
+        amountMoney = 10000000;
     }
 
     public void changeBudget(int amountMoney) {

@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.Hud;
 
 public class PoliceStation extends Building{
 
@@ -40,7 +41,7 @@ public class PoliceStation extends Building{
 		this.row = row;
 		cell = new TiledMapTileLayer.Cell[6];
 		firefighters = new ArrayList<Citizen>(10); // default 10 policemen at start
-		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
+		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
 	public void update() {
@@ -59,35 +60,21 @@ public class PoliceStation extends Building{
 
 	public void updateSelected() {
 		if(state == POLICE_STATION_SELECTED) {
-			/*cell[0] = layer.getCell(row, col);
-			cell[1] = layer.getCell(row + 1, col);
-			cell[2] = layer.getCell(row, col + 1);
-			cell[3] = layer.getCell(row + 1, col + 1);
-			cell[4] = layer.getCell(row, col + 2);
-			cell[5] = layer.getCell(row + 1, col + 2);
-			
-			cell[0].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));*/
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.policeStationSelectedCell3));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.policeStationSelectedCell4));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.policeStationSelectedCell1));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.policeStationSelectedCell2));
+
 		} else if(state == POLICE_STATION_UNSELECTED) {
-	
-			/*cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.fireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.fireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.fireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.fireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));*/
-			
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.policeStationCell3));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.policeStationCell4));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.policeStationCell1));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.policeStationCell2));
 			state = POLICE_STATION_OK;
 		}
 	}
 	
 	public void createShape() {
-		this.col = col; 
-		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
 	    float[] vertices = new float[12];
@@ -135,7 +122,8 @@ public class PoliceStation extends Building{
 	@Override
 	public void showInfo(float screenX, float screenY) {
 		// TODO Auto-generated method stub
-		
+		Hud.setInformationScreen(this, screenX, screenY);
+
 	}
 
 	@Override
