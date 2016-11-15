@@ -2,31 +2,32 @@ package com.itproject.game.buildings;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
 
-public class University extends Building {
-
+public class IronPlant extends Building {
+	
 	public static final int TILE_HEIGHT = 32;
 	public static final int TILE_WIDTH = 64;	
-	public static final int UNIVERSITY_OK = 0;
-	public static final int UNIVERSITY_ON_FIRE = 1;
-	public static final int UNIVERSITY_SELECTED = 2;
-	public static final int UNIVERSITY_UNSELECTED = 3;
-	public static final int UNIVERSITY_DESTROYED = 4;
+	public static final int IRON_PLANT_OK = 0;
+	public static final int IRON_PLANT_ON_FIRE = 1;
+	public static final int IRON_PLANT_SELECTED = 2;
+	public static final int IRON_PLANT_UNSELECTED = 3;
+	public static final int IRON_PLANT_DESTROYED = 4;
+	public static final int IRON_PLANT_HEIGHT = 3;
+	public static final int IRON_PLANT_WIDTH = 3;
 	
 	TiledMapTileLayer.Cell[] cell;
+	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> students;
-	List<Citizen> teachers;
+	List<Citizen> lords;
 	TiledMapTileLayer layer;
 	  
-	public University(int row, int col) {
+	public IronPlant(int row, int col) {
 		super(10000, 500);
 		
 		state = 0;
@@ -34,17 +35,26 @@ public class University extends Building {
 		this.col = col;
 		this.row = row;
 		cell = new TiledMapTileLayer.Cell[6];
-		students = new ArrayList<Citizen>(10); // default 10 firefighters at start
-		teachers = new ArrayList<Citizen>(10);
+		lords = new ArrayList<Citizen>(10); // default 10 firefighters at start
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
 	}
 	
 	public void update() {
 		updateSelected();
 	}
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		this.electricityBill = electricityBill;
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		this.waterBill = waterBill;
+	}
+
 	public void updateSelected() {
-		/*if(state == UNIVERSITY_SELECTED) {
+		/*if(state == IRON_PLANT_SELECTED) {
 			cell[0] = layer.getCell(row, col);
 			cell[1] = layer.getCell(row + 1, col);
 			cell[2] = layer.getCell(row, col + 1);
@@ -58,7 +68,7 @@ public class University extends Building {
 			cell[3].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
 			cell[4].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
 			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));
-		} else if(state == UNIVERSITY_UNSELECTED) {
+		} else if(state == IRON_PLANT_UNSELECTED) {
 	
 			cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
 			cell[1].setTile(new StaticTiledMapTile(Assets.fireStationCell6));
@@ -67,13 +77,11 @@ public class University extends Building {
 			cell[4].setTile(new StaticTiledMapTile(Assets.fireStationCell1));
 			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));
 			
-			state = UNIVERSITY_OK;
+			state = IRON_PLANT_OK;
 		}*/
 	}
 	
-	public void createShape(int row, int col) {
-		this.col = col; 
-		this.row = row;
+	public void createShape() {
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
 	    float[] vertices = new float[12];
@@ -106,13 +114,13 @@ public class University extends Building {
 		return row;
 	}
 	
-	public void showInfo() {
+	public void showInfo(float screenX, float screenY) {
 		// to implement
-		System.out.println("It is a Power Station!!");
+		System.out.println("It is a IRON_PLANT!!");
 	}
 
 	@Override
-	public void createCollisionShape(int row, int col) {
+	public void createCollisionShape() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -121,6 +129,46 @@ public class University extends Building {
 	public Polygon getCollisionShape() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int getZIndex() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setZIndex(int zIndex) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getPeopleSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean isPowered() {
+		return isPowered;
+	}
+
+	@Override
+	public void setPowered(boolean isPowered) {
+		this.isPowered = isPowered;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return IRON_PLANT_HEIGHT;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return IRON_PLANT_WIDTH;
 	}
 	
 	

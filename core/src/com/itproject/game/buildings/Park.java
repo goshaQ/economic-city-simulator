@@ -17,6 +17,8 @@ public class Park extends Building {
 	public static final int PARK_SELECTED = 2;
 	public static final int PARK_UNSELECTED = 3;
 	public static final int PARK_DESTROYED = 4;
+	public static final int PARK_HEIGHT = 3;
+	public static final int PARK_WIDTH = 3;
 	
 	TiledMapTileLayer.Cell[] cell;
 	int state;
@@ -40,7 +42,17 @@ public class Park extends Building {
 	public void update() {
 		updateSelected();
 	}
-	
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		//not used for park
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		//not used for park
+	}
+
 	public void updateSelected() {
 		/*if(state == PARK_SELECTED) {
 			cell[0] = layer.getCell(row, col);
@@ -69,7 +81,7 @@ public class Park extends Building {
 		}*/
 	}
 	
-	public void createShape(int row, int col) {
+	public void createShape() {
 		this.col = col; 
 		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
@@ -104,13 +116,13 @@ public class Park extends Building {
 		return row;
 	}
 	
-	public void showInfo() {
+	public void showInfo(float screenX, float screenY) {
 		// to implement
 		System.out.println("It is a Park!!");
 	}
 
 	@Override
-	public void createCollisionShape(int row, int col) {
+	public void createCollisionShape() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -119,6 +131,48 @@ public class Park extends Building {
 	public Polygon getCollisionShape() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int getZIndex() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setZIndex(int zIndex) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getPeopleSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean isPowered() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setPowered(boolean isPowered) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return PARK_HEIGHT;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return PARK_WIDTH;
 	}
 	
 	
