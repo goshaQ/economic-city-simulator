@@ -223,6 +223,7 @@ public class Assets {
 		bankGreenTiles[3] = new StaticTiledMapTile(Assets.bankGreenCell2);
 		bankRedactor = loadTexture("data/bank_redactor.png");
 		bankRedactorRegion = new TextureRegion(bankRedactor);
+
 		
 		bar = loadTexture("data/bar.png");
 		barCell1 = new TextureRegion(bar,0 ,0, 64, 96);
@@ -262,7 +263,7 @@ public class Assets {
 		groceryShopRedactor = loadTexture("data/groceryShopRedactor.png");
 		groceryShopRedactorRegion = new TextureRegion(groceryShopRedactor);
 		
-		
+
 		powerStation = loadTexture("data/powerStation.png");
 		powerStationCell1 = new TextureRegion(powerStation, 0, 0, 64, 96);
 		powerStationCell2 = new TextureRegion(powerStation, 64, 0, 64, 96);
@@ -281,6 +282,7 @@ public class Assets {
 		waterStationRegion = new TextureRegion(waterStation);
 
 		policeStationRedactor = loadTexture("data/policeStationRedactor.png");
+
 		policeStationRedactorRegion = new TextureRegion(policeStationRedactor);
 		policeStation = loadTexture("data/policeStation.png");
 		policeStationCell1 = new TextureRegion(policeStation, 0, 0, 64, 96);

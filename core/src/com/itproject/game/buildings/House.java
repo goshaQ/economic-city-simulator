@@ -11,6 +11,7 @@ import com.itproject.game.Citizen;
 import com.itproject.game.City;
 import com.itproject.game.Hud;
 
+
 public class House extends Building {
 	
 	public static final int TILE_HEIGHT = 32;
@@ -206,6 +207,7 @@ public class House extends Building {
 	private void calculateMarkup() {
 		currentProfit = (short) ((City.PRNG.nextInt(120) + baseProfitRate) * residents.size());
 	}
+
 	
 	public boolean settleResident(Citizen resident) {
 		
@@ -218,4 +220,5 @@ public class House extends Building {
 		  
 		return true;
 	}
+
 }

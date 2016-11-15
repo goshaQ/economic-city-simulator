@@ -132,5 +132,5 @@ public class Citizen {
             return false;
         }
     }
-   
+
 }
