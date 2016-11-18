@@ -21,20 +21,18 @@ public class House extends Building {
 	public static final int HOUSE_SELECTED = 2;
 	public static final int HOUSE_UNSELECTED = 3;
 	public static final int HOUSE_DESTROYED = 4;
-	public static final int HOUSE_HEIGHT = 1;
-	public static final int HOUSE_WIDTH = 1;
+	public static final int HOUSE_HEIGHT = 2;
+	public static final int HOUSE_WIDTH = 2;
 
 	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
 	private Polygon collisionShape;
-	
 	List<Citizen> residents;
-	TiledMapTileLayer.Cell cell;
 	TiledMapTileLayer layer;
 	int zIndex;
-	final byte residentsLimit = 75;
+	//final byte residentsLimit = 75;
 	
 	public House(int row, int col) {
 		super(1000, 100);
@@ -44,53 +42,127 @@ public class House extends Building {
 		zIndex = 100 - col + row;
 		cost = 5000;
 		serviceCost = 300;
-		residents = new ArrayList<Citizen>();
-		cell = new TiledMapTileLayer.Cell();
+		residents = new ArrayList<>();
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
+		isUtilityBillUpdated = false;
 	}
 	
 	public void update() {
-		updateSelected();
+		if (City.time.getDay() == 1) {
+			isUtilityBillUpdated = false;
+			payProviderOfPowerAndWater();
+		}
 	}
 	
 
 	public void updateSelected() {
 		if(state == HOUSE_SELECTED) {
-			cell = layer.getCell(row, col);
-			cell.setTile(new StaticTiledMapTile(Assets.selectedDemoBlock));
-
-		} else if(state == HOUSE_UNSELECTED){
-			cell.setTile(new StaticTiledMapTile(Assets.demoBlock));
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.houseSelectedCell3));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.houseSelectedCell4));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.houseSelectedCell1));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.houseSelectedCell2));
+		} else if(state == HOUSE_UNSELECTED) {
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.houseCell3));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.houseCell4));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.houseCell1));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.houseCell2));
 			state = HOUSE_OK;
 		}
 	}
 	
 	
 	public void createShape() {
-		this.col = col; 
-		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
 	    float[] vertices = new float[12];
 	    vertices[0] = screenx;   vertices[1] = screeny;
-	    vertices[2] = screenx + 32; vertices[3] = screeny - 16;
-	    vertices[4] = screenx + 64; vertices[5] = screeny;
-	    vertices[6] = screenx + 64; vertices[7] = screeny + 32;
-	    vertices[8] = screenx + 32; vertices[9] = screeny - 16 + 64;
-	    vertices[10] = screenx; vertices[11] = screeny + 32;
+	    vertices[2] = screenx + 64; vertices[3] = screeny - 32;
+	    vertices[4] = screenx + 128; vertices[5] = screeny;
+	    vertices[6] = screenx + 128; vertices[7] = screeny + 64;
+	    vertices[8] = screenx + 64; vertices[9] = screeny + 96;
+	    vertices[10] = screenx; vertices[11] = screeny + 64;
 		shape = new Polygon(vertices);
 	}
 
 	public void createCollisionShape() {
-		this.col = col; 
-		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
-	    float[] vertices = new float[8];
+	    float[] vertices = new float[12];
 	    vertices[0] = screenx;   vertices[1] = screeny;
-	    vertices[2] = screenx + 32; vertices[3] = screeny - 16;
-	    vertices[4] = screenx + 64; vertices[5] = screeny;
-	    vertices[6] = screenx + 32; vertices[7] = screeny + 16;
+	    vertices[2] = screenx + 64; vertices[3] = screeny - 32;
+	    vertices[4] = screenx + 128; vertices[5] = screeny;
+	    vertices[6] = screenx + 128; vertices[7] = screeny + 64;
+	    vertices[8] = screenx + 64; vertices[9] = screeny + 96;
+	    vertices[10] = screenx; vertices[11] = screeny + 64;
+	    shape = new Polygon(vertices);
+	}
+	
+	final short serviceBill = 16000;
+	final short baseProfitRate = 100;
+	final byte residentsLimit = 75;
+
+	boolean isUtilityBillUpdated;
+	short collectedMoney;
+	public short utilityBill;
+	short currentProfit;
+
+	@Override
+	public void setElectricityBill(short electricityBill) {
+		this.electricityBill = electricityBill;
+	}
+
+	@Override
+	public void setWaterBill(short waterBill) {
+		this.waterBill = waterBill;
+	}
+
+	public void calculateUtilityBill() {
+		if(!residents.isEmpty()) {
+			calculateMarkup();
+			utilityBill = (short) ((electricityBill + waterBill + serviceBill + currentProfit) / residents.size());
+
+			isUtilityBillUpdated = true;
+		}
+	}
+
+	public short payUtility(Citizen resident) {
+		if (!isUtilityBillUpdated) {
+			calculateUtilityBill();
+		}
+
+		if (resident.moneySavings - utilityBill >= 0) {
+			collectedMoney += utilityBill;
+			return utilityBill;
+		} else {
+			return 0;
+		}
+	}
+
+	public boolean settleResident(Citizen resident) {
+		if (residents.size() < residentsLimit) {
+			resident.house = this;
+			residents.add(resident);
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void moveOut(Citizen resident) {
+		residents.remove(resident);
+	}
+
+	public void payProviderOfPowerAndWater() {
+		if (collectedMoney - serviceBill >= electricityBill + waterBill) {
+			City.budget.changeBudget(currentProfit);
+		} else {
+			City.budget.changeBudget(-(electricityBill + waterBill + serviceBill - collectedMoney));
+		}
+	}
+
+	private void calculateMarkup() {
+		currentProfit = (short) ((City.PRNG.nextInt(120) + baseProfitRate) * residents.size());
 	}
 	
 	public Polygon getCollisionShape() {
@@ -129,14 +201,7 @@ public class House extends Building {
 
 	@Override
 	public void setZIndex(int zIndex) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public int getPeopleSize() {
-		// TODO Auto-generated method stub
-		return residents.size();
+		this.zIndex = zIndex;
 	}
 
 	@Override
@@ -148,77 +213,15 @@ public class House extends Building {
 	public void setPowered(boolean isPowered) {
 		this.isPowered = isPowered;
 	}
-
+	
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
 		return HOUSE_HEIGHT;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
 		return HOUSE_WIDTH;
-	}
-
-	final short serviceBill = 16000;
-	final short baseProfitRate = 100;
-
-	short collectedMoney;
-	public short utilityBill;
-	short currentProfit;
-
-	@Override
-	public void setElectricityBill(short electricityBill) {
-		this.electricityBill = electricityBill;
-	}
-
-	@Override
-	public void setWaterBill(short waterBill) {
-		this.waterBill = waterBill;
-	}
-
-	public void calculateUtilityBill() {
-		calculateMarkup();
-		utilityBill = (short) ((electricityBill + waterBill + serviceBill + currentProfit) / residents.size());
-	}
-
-	public short payUtility(Citizen resident) {
-		if (resident.moneySavings - utilityBill >= 0) {
-			collectedMoney += utilityBill;
-			return utilityBill;
-		} else {
-			return 0;
-		}
-	}
-
-	public void moveOut(Citizen resident) {
-		residents.remove(resident);
-	}
-
-	public void payProviderOfPowerAndWater() {
-		if (collectedMoney - serviceBill >= electricityBill + waterBill) {
-			City.budget.changeBudget(currentProfit);
-		} else {
-			City.budget.changeBudget(-(electricityBill + waterBill + serviceBill - collectedMoney));
-		}
-	}
-
-	private void calculateMarkup() {
-		currentProfit = (short) ((City.PRNG.nextInt(120) + baseProfitRate) * residents.size());
-	}
-
-	
-	public boolean settleResident(Citizen resident) {
-		
-		if (residents.size() < residentsLimit && resident.moneySavings >= utilityBill && resident.house == null) {
-			residents.add(resident);
-			resident.house = this;
-		} else {
-		   return false;
-		}
-		  
-		return true;
 	}
 
 }

@@ -26,34 +26,30 @@ public class Bank extends Building{
 
 
 	boolean isPowered;
-
-	TiledMapTileLayer.Cell[] cell;
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> bankers;
-	List<Citizen> clerks;
+	public List<Citizen> bankers;
+	public List<Citizen> clerks;
 	TiledMapTileLayer layer;
-	  
+	int zIndex;
+
 	public Bank(int row, int col) {
 		super(5000, 300);
-		
 		state = 0;
-		
+		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		cell = new TiledMapTileLayer.Cell[6];
-		bankers = new ArrayList<Citizen>(10); // default 10 firefighters at start
+		bankers = new ArrayList<Citizen>(10); 
 		clerks = new ArrayList<Citizen>(10);
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
-	public void sendCrew() {
-		// Send closest team of firefighters to prevent fire
-	}
-	
 	public void update() {
 		updateSelected();
+		if (City.time.getDay() == 1) {
+			paySalary();
+		}
 	}
 
 	@Override
@@ -98,6 +94,67 @@ public class Bank extends Building{
 	    vertices[20] = screenx + 3; vertices[21] = screeny + 3;
 		shape = new Polygon(vertices);
 	}
+
+	final byte clercksLimit = 120;
+	final byte bankersLimit = 60;
+
+	final short clerckSalary = 2400;
+	final short bankersSalary = 4800;
+
+	final short serviceBill = 18000;
+
+	float percent;
+	boolean isLoanTaken;
+	short period;
+	int monthlyPayment;
+
+	public boolean hireEmployee(Citizen employee) {
+		if (clerks.size() < clercksLimit) {
+			clerks.add(employee);
+
+			employee.salary = clerckSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.CLERCK;
+		} else if(bankers.size() < bankersLimit) {
+			bankers.add(employee);
+
+			employee.salary = bankersSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.BANKER;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void paySalary() {
+		clerks.forEach(Citizen::getSalary);
+		clerks.forEach(Citizen::getSalary);
+	}
+
+	public void loan(int amountMoney) {
+		isLoanTaken = true;
+		monthlyPayment = Math.round(amountMoney * (1 + percent) / period);
+
+		City.budget.changeBudget(amountMoney);
+	}
+
+	public void calculatePercent(Interval interval, int amountMoney) {
+		period = (byte) (interval.getYear() * 12 + interval.getMonth());
+		if (electricityBill == 0 && waterBill == 0) {
+			percent = 24 + City.PRNG.nextFloat() * 12;
+		} else {
+			percent = (electricityBill + waterBill + serviceBill) * period / amountMoney +
+					City.PRNG.nextFloat() * 6;
+		}
+	}
+	
+	public void showInfo(float screenX, float screenY) {
+		// to implement
+		Hud.setInformationScreen(this, screenX, screenY);
+		System.out.println("It is a BANK!!");
+	}
 	
 	public int getState() {
 		return state;
@@ -119,45 +176,27 @@ public class Bank extends Building{
 		return row;
 	}
 	
-	public void showInfo(float screenX, float screenY) {
-		// to implement
-		Hud.setInformationScreen(this, screenX, screenY);
-		System.out.println("It is a BANK!!");
-	}
-
 	@Override
 	public void createCollisionShape() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public Polygon getCollisionShape() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int getZIndex() {
-		// TODO Auto-generated method stub
-		return 0;
+		return zIndex;
 	}
 
 	@Override
 	public void setZIndex(int zIndex) {
-		// TODO Auto-generated method stub
-
+		this.zIndex = zIndex;
 	}
-
-	@Override
-	public int getPeopleSize() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 	@Override
 	public boolean isPowered() {
-		// TODO Auto-generated method stub
 		return isPowered;
 	}
 
@@ -168,63 +207,12 @@ public class Bank extends Building{
 
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
 		return BANK_HEIGHT;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
 		return BANK_WIDTH;
 	}
 
-	final byte clercksLimit = 120;
-	final byte bankersLimit = 60;
-
-	final short clerckSalary = 2400;
-	final short bankersSalary = 4800;
-
-	final short serviceBill = 18000;
-
-	float percent;
-	boolean isLoanTaken;
-	short period;
-	int monthlyPayment;
-
-	public boolean hireEmployee(Citizen employee) {
-		if (clerks.size() <= clercksLimit) {
-			clerks.add(employee);
-
-			employee.salary = clerckSalary;
-			employee.isSalaryChanged = true;
-			employee.occupation = Citizen.Occupation.CLERCK;
-		} else if(bankers.size() <= bankersLimit) {
-			bankers.add(employee);
-
-			employee.salary = bankersSalary;
-			employee.isSalaryChanged = true;
-			employee.occupation = Citizen.Occupation.BANKER;
-		} else {
-			return false;
-		}
-
-		return true;
-	}
-
-	public void loan(int amountMoney) {
-		isLoanTaken = true;
-		monthlyPayment = Math.round(amountMoney * (1 + percent) / period);
-
-		City.budget.changeBudget(amountMoney);
-	}
-
-	public void calculatePercent(Interval interval, int amountMoney) {
-		period = (byte) (interval.getYear() * 12 + interval.getMonth());
-		if (electricityBill == 0 && waterBill == 0) {
-
-		} else {
-			percent = (electricityBill + waterBill + serviceBill) * period / amountMoney +
-					City.PRNG.nextFloat() * 6;
-		}
-	}
 }

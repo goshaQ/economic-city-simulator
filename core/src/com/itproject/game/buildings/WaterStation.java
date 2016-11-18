@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
@@ -22,28 +23,32 @@ public class WaterStation extends Building {
 	public static final int WATER_STATION_HEIGHT = 1;
 	public static final int WATER_STATION_WIDTH = 1;
 
-	TiledMapTileLayer.Cell[] cell;
 	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
 	List<Citizen> worker;
 	TiledMapTileLayer layer;
-	  
+	TiledMapTileLayer statusLayer;
+	int zIndex;
+	
 	public WaterStation(int row, int col) {
 		super(10000, 500);
-		
 		state = 0;
-		
+		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		cell = new TiledMapTileLayer.Cell[6];
-		worker = new ArrayList<Citizen>(10); // default 10 firefighters at start
-		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
+		worker = new ArrayList<Citizen>(10); 
+		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
+		statusLayer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("statusLayer");
+		employees = new ArrayList<Citizen>(10);
 	}
 	
 	public void update() {
 		updateSelected();
+		if (City.time.getDay() == 1) {
+			calculateBIll();
+		}
 	}
 
 	@Override
@@ -57,129 +62,40 @@ public class WaterStation extends Building {
 	}
 
 	public void updateSelected() {
-		/*if(state == WATER_STATION_SELECTED) {
-			cell[0] = layer.getCell(row, col);
-			cell[1] = layer.getCell(row + 1, col);
-			cell[2] = layer.getCell(row, col + 1);
-			cell[3] = layer.getCell(row + 1, col + 1);
-			cell[4] = layer.getCell(row, col + 2);
-			cell[5] = layer.getCell(row + 1, col + 2);
-			
-			cell[0].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));
+		if(state == WATER_STATION_SELECTED) {
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.waterStationSelectedCell));
+			//for(int i = col - 13; i <= col  + 12; i++) {
+			//	for(int j = row - 13; j <= row + 12; j++) {
+			//		statusLayer.setCell(i, j, new TiledMapTileLayer.Cell());
+			//		statusLayer.getCell(i, j).setTile(Assets.waterDropTile);
+			//	}
+			//}
 		} else if(state == WATER_STATION_UNSELECTED) {
-	
-			cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.fireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.fireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.fireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.fireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));
-			
+			//for(int i = col - 13; i <= col  + 12; i++) {
+			//	for(int j = row - 13; j <= row + 12; j++) {
+			//		statusLayer.getCell(i, j).setTile(null);
+			//	}
+			//}
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.waterStationRegion));
 			state = WATER_STATION_OK;
-		}*/
+		}
 	}
 	
 	public void createShape() {
-		this.col = col; 
-		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
-	    float[] vertices = new float[12];
+	    float[] vertices = new float[16];
 	    vertices[0] = screenx;   vertices[1] = screeny;
-	    vertices[2] = screenx + 64; vertices[3] = screeny - 32;
-	    vertices[4] = screenx + 128; vertices[5] = screeny;
-	    vertices[6] = screenx + 128; vertices[7] = screeny + 32;
-	    vertices[8] = screenx + 64; vertices[9] = screeny - 32 + 128;
-	    vertices[10] = screenx; vertices[11] = screeny + 64;
+	    vertices[2] = screenx + 32; vertices[3] = screeny - 16;
+	    vertices[4] = screenx + 64; vertices[5] = screeny;
+	    vertices[6] = screenx + 64; vertices[7] = screeny + 72;
+	    vertices[8] = screenx + 64 - 20; vertices[9] = screeny + 72 + 8;
+	    vertices[10] = screenx + 64 - 38; vertices[11] = screeny + 72 + 8;
+	    vertices[12] = screenx + 4; vertices[13] = screeny + 72;
+	    vertices[14] = screenx; vertices[15] = screeny + 64;
 		shape = new Polygon(vertices);
 	}
 	
-	public int getState() {
-		return state;
-	}
-	
-	public void setState(int state) {
-		this.state = state;
-	}
-	
-	public Polygon getShape() {
-		return shape;
-	}
-	
-	public int getCol() {
-		return col;
-	}
-	
-	public int getRow() {
-		return row;
-	}
-	
-	public void showInfo(float screenX, float screenY) {
-		// to implement
-		Hud.setInformationScreen(this, screenX, screenY);
-
-		System.out.println("It is a Power Station!!");
-	}
-
-	@Override
-	public void createCollisionShape() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Polygon getCollisionShape() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getZIndex() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void setZIndex(int zIndex) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public int getPeopleSize() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean isPowered() {
-		return isPowered;
-	}
-
-	@Override
-	public void setPowered(boolean isPowered) {
-		this.isPowered = isPowered;
-	}
-
-	@Override
-	public int getHeight() {
-		// TODO Auto-generated method stub
-		return WATER_STATION_HEIGHT;
-	}
-
-	@Override
-	public int getWidth() {
-		// TODO Auto-generated method stub
-		return WATER_STATION_WIDTH;
-	}
-
-	
-
 	final byte buildingsLimit = 8;
 	final byte employeeLimitForBlock = 4;
 	final short employeeSalary = 3200;
@@ -191,7 +107,7 @@ public class WaterStation extends Building {
 	public short taxes;
 
 	List<Building> buildings;
-	List<Citizen> employees;
+	public List<Citizen> employees;
 
 	public boolean attachBuilding(Building building) {
 		if (buildings.size() <= buildingsLimit) {
@@ -235,4 +151,75 @@ public class WaterStation extends Building {
 	private void calculateMarkup() {
 		currentProfit = (short) ((City.PRNG.nextInt(400) + baseProfitRate) * buildings.size());
 	}
+	
+	public int getState() {
+		return state;
+	}
+	
+	public void setState(int state) {
+		this.state = state;
+	}
+	
+	public Polygon getShape() {
+		return shape;
+	}
+	
+	public int getCol() {
+		return col;
+	}
+	
+	public int getRow() {
+		return row;
+	}
+	
+	public void showInfo(float screenX, float screenY) {
+		// to implement
+		Hud.setInformationScreen(this, screenX, screenY);
+
+		System.out.println("It is a Power Station!!");
+	}
+
+	@Override
+	public void createCollisionShape() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Polygon getCollisionShape() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getZIndex() {
+		return zIndex;
+	}
+
+	@Override
+	public void setZIndex(int zIndex) {
+		this.zIndex = zIndex;
+	}
+
+	@Override
+	public boolean isPowered() {
+		return isPowered;
+	}
+
+	@Override
+	public void setPowered(boolean isPowered) {
+		this.isPowered = isPowered;
+	}
+
+	@Override
+	public int getHeight() {
+		return WATER_STATION_HEIGHT;
+	}
+
+	@Override
+	public int getWidth() {
+		return WATER_STATION_WIDTH;
+	}
+
+	
 }

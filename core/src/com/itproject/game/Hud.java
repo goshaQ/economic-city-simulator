@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -58,11 +60,11 @@ public class Hud {
 		@Override
 		public void act(float delta) {
 			deltaTime += delta;
-			if(deltaTime >= 1f) {
+			if(deltaTime >= 1 / 6f) {
 				dayValue.setText(String.format("%02d", City.time.getDay()));
 				monthValue.setText(String.format("%02d", City.time.getMonth()));
 				yearValue.setText(String.format("%d", City.time.getYear()));
-				deltaTime -= 1f;
+				deltaTime -= 1 / 6f;
 			}
 		}
 	}
@@ -71,25 +73,30 @@ public class Hud {
 		float deltaTime = 0;
 		Table timerContent = new Table();
 		Label budget; Label budgetValue;
-		
+		Label population; Label populationValue;
 		
 		public HudBudget() {
 			budget = new Label("Budget", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 			budgetValue = new Label(String.format("$%03d", City.budget.amountMoney) ,new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+			population = new Label("Population", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+			populationValue = new Label(String.format("%03d", City.citizens.size()) ,new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 			//setFillParent(true);
-			//debug();
-			add(budget).expandX().padTop(10);
+			debug();
+			add(population).expandX().uniform();
+			add(budget);
 			row();
-			add(budgetValue).expandX();
+			add(populationValue);
+			add(budgetValue);
 			setTouchable(Touchable.enabled);
 			
 		}	
 		@Override
 		public void act(float delta) {
 			deltaTime += delta;
-			if(deltaTime >= 1f) {
+			if(deltaTime >= 1 / 6f) {
 				budgetValue.setText(String.format("$%03d", City.budget.amountMoney));
-				deltaTime -= 1f;
+				populationValue.setText(String.format("%03d", City.citizens.size()));
+				deltaTime -= 1f / 6f;
 			}
 		}
 	}
@@ -98,11 +105,13 @@ public class Hud {
 	
 	public static Stage stage;
 	private Viewport viewport;
+	OrthographicCamera camera;
 	
 	private Integer worldTimer;
 	private float timeCount;
 	private Integer score;
 	
+	public static Actor statisticsActor;
 	public static Actor redactorActor;
 	public static Actor infoActor;
 	public static int redactorStep = 0;
@@ -114,9 +123,11 @@ public class Hud {
 	Label worldLabel;
 	Label marioLabel;
 	Label scoreLabel;
+	ShapeRenderer shape = new ShapeRenderer();
 	
 	public Hud(SpriteBatch sb, OrthographicCamera camera) {
 		
+		this.camera = camera;
 		worldTimer = 300;
 		timeCount = 0;
 		score = 0;
@@ -144,9 +155,6 @@ public class Hud {
 		table.add(countdownLabel).expandX();
 		
 		BuildingRedactorWindow window = new BuildingRedactorWindow();
-		
-		
-		
 		BuildingRedactorWindow.FireStationRedactor fire = window.new FireStationRedactor();
 		BuildingRedactorWindow.HouseRedactor house = window.new HouseRedactor();
 		BuildingRedactorWindow.BankRedactor bank = window.new BankRedactor();
@@ -157,54 +165,23 @@ public class Hud {
 		BuildingRedactorWindow.WaterStationRedactor water = window.new WaterStationRedactor();
 		BuildingRedactorWindow.GroceryShopRedactor grocery = window.new GroceryShopRedactor();
 		BuildingRedactorWindow.BarRedactor bar = window.new BarRedactor();
+		BuildingRedactorWindow.OilPlantRedactor oil = window.new OilPlantRedactor();
+		BuildingRedactorWindow.IronPlantRedactor iron = window.new IronPlantRedactor();
+		BuildingRedactorWindow.ParkRedactor park = window.new ParkRedactor();
+		BuildingRedactorWindow.WTCRedactor wtc = window.new WTCRedactor();
 		
-		//fire.setOrigin(0, 0);
-	
-		//im.setScaling(Scaling.fit);
-		
-		//redactorMenu.setBounds(0, 0, im.getImageWidth(), im.getImageHeight());
-	
-		//redactorMenu.setSize();
 		final Table redactorMenu = new Table();
 		redactorMenu.setFillParent(true);
 		redactorMenu.right().bottom();
-		//redactorMenu.debug();
-		
 		Table innerRedactorMenu = new Table();
 		redactorMenu.add(innerRedactorMenu).width(420f).height(400f);
-		
 		innerRedactorMenu.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture("data/buildingInformationWindow.png"))));
-		
 		final Table redactorMenuContent = new Table();
 		final ScrollPane scrollable = new ScrollPane(redactorMenuContent);
-	//	scrollable.debug();
 		scrollable.setScrollingDisabled(true, false);
 		scrollable.setFlickScroll(false);
-		
-		//scrollable.setCullingArea(cullingArea);
 		innerRedactorMenu.add(scrollable).width(400f).height(375f).center();
 		innerRedactorMenu.row();
-		//redactorMenu.row();
-		//redactorMenu.add(redactorMenuContent);
-		
-		//tableweq.addActor(redactorMenuContent);
-	/*	redactorMenuContent.setOrigin(0, 0);
-		redactorMenuContent.setPosition(0, 0);*/
-		//window.addActor(redactorMenuContent);
-		//redactorMenuContent.right();
-		//redactorMenuContent.setOrigin(1000, 0);
-		
-		//redactorMenuContent.setFillParent(true);
-		//redactorMenuContent.setSize(im.getWidth(), im.getHeight());
-		//redactorMenuContent.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture("data/redactorMenu_demo.png"))));
-
-		//redactorMenuContent.setBounds(redactorMenu.getOriginX(), redactorMenu.getOriginY(), redactorMenu.getWidth(), redactorMenu.getHeight());;
-	
-		//table2.setFillParent(true);
-	
-		
-	//	redactorMenuContent.setBackground();
-		//redactorMenuContent.debug();
 		redactorMenuContent.right();
 		redactorMenuContent.padRight(10);
 		redactorMenuContent.add(new Label("Fire Station" , new Label.LabelStyle(new BitmapFont(), Color.BLACK)));
@@ -262,7 +239,28 @@ public class Hud {
 		redactorMenuContent.row().height(20f);
 		redactorMenuContent.add();
 		redactorMenuContent.row();
-		
+		redactorMenuContent.add(new Label("World Trade Center" , new Label.LabelStyle(new BitmapFont(), Color.BLACK)));
+		redactorMenuContent.add(new Label("Park" , new Label.LabelStyle(new BitmapFont(), Color.BLACK)));
+		redactorMenuContent.row();
+		redactorMenuContent.add(wtc).uniform();
+		redactorMenuContent.add(park).uniform();
+		redactorMenuContent.row();
+		redactorMenuContent.add(new Label(String.format("$%d", 150000), new Label.LabelStyle(new BitmapFont(), Color.WHITE)));
+		redactorMenuContent.add(new Label(String.format("$%d", 300000), new Label.LabelStyle(new BitmapFont(), Color.WHITE)));
+		redactorMenuContent.row().height(20f);
+		redactorMenuContent.add();
+		redactorMenuContent.row();
+		redactorMenuContent.add(new Label("Oil Plant" , new Label.LabelStyle(new BitmapFont(), Color.BLACK)));
+		redactorMenuContent.add(new Label("Iron Plant" , new Label.LabelStyle(new BitmapFont(), Color.BLACK)));
+		redactorMenuContent.row();
+		redactorMenuContent.add(oil).uniform();
+		redactorMenuContent.add(iron).uniform();
+		redactorMenuContent.row();
+		redactorMenuContent.add(new Label(String.format("$%d", 150000), new Label.LabelStyle(new BitmapFont(), Color.WHITE)));
+		redactorMenuContent.add(new Label(String.format("$%d", 300000), new Label.LabelStyle(new BitmapFont(), Color.WHITE)));
+		redactorMenuContent.row().height(20f);
+		redactorMenuContent.add();
+		redactorMenuContent.row();
 				
 		Table bottomHud = new Table();
 		bottomHud.left().bottom();
@@ -273,7 +271,6 @@ public class Hud {
 		final Image roadButton = new Image(new Texture("data/roadButton.png"));
 		final Image statisticsButton = new Image(new Texture("data/statisticsButton.png"));
 		redactorButton.addListener(new InputListener() {
-			
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				redactorButton.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture("data/redactorButtonPressed.png"))));  
 				if(redactorStep == 0) {
@@ -292,7 +289,6 @@ public class Hud {
 				return;
 			}	
 		});
-		
 		roadButton.addListener(new InputListener() {
 			
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -307,16 +303,28 @@ public class Hud {
 			}	
 		});
 		
+		Table statisticsMenu = new Table();
+		Table statisticsMenuContainer = new Table();
+		Table statisticsPlotFunctionContainer = new Table();
+		statisticsPlotFunctionContainer.debug();
+		
+		statisticsMenu.setFillParent(true);
+		statisticsMenu.add(statisticsMenuContainer).width(800f).height(400f);
+		statisticsMenuContainer.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture("data/buildingInformationWindow.png"))));
+		statisticsMenuContainer.add(statisticsPlotFunctionContainer).width(780f).height(380).center();
+		
+	
+		//statisticsPlotFunctionContainer.add(shape).center();
 		statisticsButton.addListener(new InputListener() {
 			
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				statisticsButton.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture("data/statisticsButtonPressed.png"))));  
 				if(statisticsStep == 0) {
-					//stage.addActor(statisticsMenu);
-					//statisticsActor = stage.getActors().get(stage.getActors().size - 1);
+					stage.addActor(statisticsMenu);
+					statisticsActor = stage.getActors().get(stage.getActors().size - 1);
 					statisticsStep = 1;
 				} else {
-					//statisticsActor.remove();
+					statisticsActor.remove();
 					statisticsStep = 0;
 				}
 				return true;
@@ -333,9 +341,7 @@ public class Hud {
 		
 		
 		Table buttons = new Table();
-		//buttons.debug();
 		buttons.bottom();
-		//buttons.setFillParent(true);
 		buttons.row().padRight(30f);
 		buttons.add(redactorButton);
 		buttons.add(roadButton);
@@ -344,15 +350,11 @@ public class Hud {
 		bottomHud.add(buttons).expandX().left().bottom();
 		bottomHud.add().expandX();
 		
-		//Image hudBottom = new Image(new Texture("data/hudBottom.png"));
 		Table hudTopContent = new Table();
 		hudTopContent.setFillParent(true);
-		//hudTopContent.debug();
-		//hudTopContent.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture("data/hudTop.png"))));
 		hudTopContent.top();
 		HudTimer timer = new HudTimer();
 		HudBudget budget = new HudBudget();
-		//timer.debug();
 		hudTopContent.add(timer).center();
 		Table budgetHudTop = new Table();
 		budgetHudTop.setFillParent(true);
@@ -363,16 +365,10 @@ public class Hud {
 	
 		Image hudTop = new Image(new Texture("data/hutTopDemo.png"));
 		hudTop.setPosition(0, Gdx.graphics.getHeight() - 80);
-		//.bank.stage.addActor(hudBottom);
 		stage.addActor(hudTop);
 		stage.addActor(hudTopContent);
 		stage.addActor(budgetHudTop);
-		//stage.addActor(table);
 		stage.addActor(bottomHud);
-		
-		//stage.addActor(tableweq);
-		//stage.addActor(redactorMenuContent);
-		//stage.addActor(redactorMenu);
 		
 	}
 	
@@ -383,7 +379,7 @@ public class Hud {
 		//buildingInfo.debug();
 		
 		Label people = new Label("People:" , new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-		Label peopleCount = new Label(String.format("%d", building.getPeopleSize()), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+		//Label peopleCount = new Label(String.format("%d", building.getPeopleSize()), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 		
 		//Image actor = new Image(new Texture("data/buildingInformationWindow.png"));
 		Table content = new Table();
@@ -394,7 +390,7 @@ public class Hud {
 		content.add().expandX();
 		content.row();
 		content.add(people).expandX();
-		content.add(peopleCount).expandX();
+		//content.add(peopleCount).expandX();
 		content.debug();
 		content.setOrigin(screenX, screenY);
 		buildingInfo.setTouchable(Touchable.enabled);
@@ -402,5 +398,15 @@ public class Hud {
 		//stage.addActor(actor);
 		infoActor = stage.getActors().get(stage.getActors().size - 1);
 		
+	}
+	
+	public void renderShapes() {
+		shape.begin(ShapeType.Point);
+		shape.setColor(1, 1, 1, 1);
+		//shape.
+		for(int x = 0; x < 100; x++)
+		shape.point(x, City.citizens.size(), 0);
+		
+		shape.end();
 	}
 }

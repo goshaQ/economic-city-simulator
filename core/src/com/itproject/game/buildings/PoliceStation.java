@@ -22,25 +22,21 @@ public class PoliceStation extends Building{
 	public static final int POLICE_STATION_HEIGHT = 2;
 	public static final int POLICE_STATION_WIDTH = 2;
 
-
-	
-	TiledMapTileLayer.Cell[] cell;
 	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> firefighters;
+	List<Citizen> policemen;
 	TiledMapTileLayer layer;
-	  
+	int zIndex;
+	
 	public PoliceStation(int row, int col) {
 		super(5000, 300);
-		
 		state = 0;
-		
+		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		cell = new TiledMapTileLayer.Cell[6];
-		firefighters = new ArrayList<Citizen>(10); // default 10 policemen at start
+		policemen = new ArrayList<Citizen>(10); 
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
@@ -83,7 +79,7 @@ public class PoliceStation extends Building{
 	    vertices[4] = screenx + 128; vertices[5] = screeny;
 	    vertices[6] = screenx + 128; vertices[7] = screeny + 32;
 	    vertices[8] = screenx + 64; vertices[9] = screeny - 32 + 128;
-	    vertices[10] = screenx; vertices[11] = screeny + 64;
+	    vertices[10] = screenx; vertices[11] = screeny + 32;
 		shape = new Polygon(vertices);
 	}
 	
@@ -128,20 +124,12 @@ public class PoliceStation extends Building{
 
 	@Override
 	public int getZIndex() {
-		// TODO Auto-generated method stub
-		return 0;
+		return zIndex;
 	}
 
 	@Override
 	public void setZIndex(int zIndex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getPeopleSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		this.zIndex = zIndex;
 	}
 
 	@Override
@@ -154,18 +142,15 @@ public class PoliceStation extends Building{
 	public void setPowered(boolean isPowered) {
 		this.isPowered = isPowered;
 	}
-
+	
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
 		return POLICE_STATION_HEIGHT;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
 		return POLICE_STATION_WIDTH;
 	}
-	
-	
+
 }

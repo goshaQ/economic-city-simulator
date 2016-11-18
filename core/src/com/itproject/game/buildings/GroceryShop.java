@@ -32,12 +32,11 @@ public class GroceryShop extends Building {
 	  
 	public GroceryShop(int row, int col) {
 		super(10000, 500);
-		
 		state = 0;
 		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		worker = new ArrayList<Citizen>(10); // default 10 firefighters at start
+		worker = new ArrayList<Citizen>(10); 
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
@@ -103,14 +102,12 @@ public class GroceryShop extends Building {
 	public void showInfo(float screenX, float screenY) {
 		// to implement
 		Hud.setInformationScreen(this, screenX, screenY);
-
 		System.out.println("It is a CityHall!!");
 	}
 
 	@Override
 	public void createCollisionShape() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -130,12 +127,6 @@ public class GroceryShop extends Building {
 	}
 
 	@Override
-	public int getPeopleSize() {
-		// TODO Auto-generated method stub
-		return worker.size();
-	}
-
-	@Override
 	public boolean isPowered() {
 		return isPowered;
 	}
@@ -144,18 +135,15 @@ public class GroceryShop extends Building {
 	public void setPowered(boolean isPowered) {
 		this.isPowered = isPowered;
 	}
-
+	
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
 		return GROCERY_SHOP_HEIGHT;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
 		return GROCERY_SHOP_WIDTH;
 	}
-	
-	
+
 }

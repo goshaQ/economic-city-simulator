@@ -3,9 +3,10 @@ package com.itproject.game;
 import com.itproject.game.buildings.Building;
 import com.itproject.game.buildings.Hospital;
 import com.itproject.game.buildings.House;
+import com.itproject.game.buildings.WorldTradeCenter;
 
 public class Citizen {
-    public enum Occupation {BANKER, CLERCK, DOCTOR, WATERSTATIONWORKER, POWERSTATIONWORKER, FIREMAN, UNEMPLOYED}
+    public enum Occupation {TRADER, SELLER, BANKER, CLERCK, DOCTOR, WATERSTATIONWORKER, POWERSTATIONWORKER, FIREMAN, UNEMPLOYED}
 
     public Occupation occupation;
     public final Worldview.WorldviewType worldview;
@@ -33,6 +34,7 @@ public class Citizen {
         this.age = new Interval((byte)0, (byte)0, (short)0);
         this.daysWithoutUpdate = 0;
         this.moneySavings = moneyFromParent;
+        this.occupation = Occupation.UNEMPLOYED;
         this.ageOfLastProcreation = new Interval((byte)0, (byte)0, (short)0);
     }
 
@@ -42,6 +44,7 @@ public class Citizen {
         this.age = age;
         this.daysWithoutUpdate = 0;
         this.moneySavings = moneyFromParent;
+        this.occupation = Occupation.UNEMPLOYED;
         this.ageOfLastProcreation = new Interval((byte)0, (byte)0, (short)0);
     }
 
@@ -52,10 +55,12 @@ public class Citizen {
             daysWithoutUpdate -= week.getDay();
 
             // check whether is ready to spend money
-            /*if (City.time.getDay() <= week.getDay()) {
+            if (City.time.getDay() <= week.getDay()) {
                 if (!((monthlyExpenses = house.payUtility(this)) > 0)) {
                     house.moveOut(this);
                 }
+
+                System.out.println(monthlyExpenses);
 
                 monthlyExpenses += (short) ((City.PRNG.nextFloat() * 0.06 + 0.24) * salary);
 
@@ -70,6 +75,20 @@ public class Citizen {
                         break;
                     // go to world trade center
                     case 2:
+                        int purchasePrice = 0;
+
+                        for (Building building : City.buildings) {
+                            if (building instanceof WorldTradeCenter) {
+                                purchasePrice = ((WorldTradeCenter) building).visitWTC(this);
+                                if (purchasePrice > 0) {
+                                    break;
+                                }
+                            }
+
+                            if (purchasePrice > 0) {
+                                monthlyExpenses += purchasePrice;
+                            }
+                        }
                         break;
                     // go to hospital
                     case 3:
@@ -97,7 +116,7 @@ public class Citizen {
                     //TODO became a homeless
                     monthlyExpenses = 0;
                 }
-            }*/
+            }
 
             // check whether is ready to procreate
             Interval interval = age.subtractInterval(ageOfLastProcreation);

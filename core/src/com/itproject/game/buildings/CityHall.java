@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
@@ -18,26 +19,24 @@ public class CityHall extends Building {
 	public static final int CITYHALL_UNSELECTED = 3;
 	public static final int CITYHALL_DESTROYED = 4;
 	public static final int CITYHALL_HEIGHT = 3;
-	public static final int CITYHALL_WIDTH = 3;
-	
-	TiledMapTileLayer.Cell[] cell;
+	public static final int CITYHALL_WIDTH = 2;
+
 	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
 	List<Citizen> lords;
 	TiledMapTileLayer layer;
-	  
+	int zIndex;
+	
 	public CityHall(int row, int col) {
 		super(10000, 500);
-		
 		state = 0;
-		
+		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		cell = new TiledMapTileLayer.Cell[6];
 		lords = new ArrayList<Citizen>(10); // default 10 firefighters at start
-		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
+		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
 	public void update() {
@@ -55,45 +54,38 @@ public class CityHall extends Building {
 	}
 
 	public void updateSelected() {
-		/*if(state == CITYHALL_SELECTED) {
-			cell[0] = layer.getCell(row, col);
-			cell[1] = layer.getCell(row + 1, col);
-			cell[2] = layer.getCell(row, col + 1);
-			cell[3] = layer.getCell(row + 1, col + 1);
-			cell[4] = layer.getCell(row, col + 2);
-			cell[5] = layer.getCell(row + 1, col + 2);
-			
-			cell[0].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));
+		if(state == CITYHALL_SELECTED) {
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.cityHallSelectedCell5));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.cityHallSelectedCell6));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.cityHallSelectedCell3));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.cityHallSelectedCell4));
+			layer.getCell(row, col + 2).setTile(new StaticTiledMapTile(Assets.cityHallSelectedCell1));
+			layer.getCell(row + 1, col + 2).setTile(new StaticTiledMapTile(Assets.cityHallSelectedCell2));
 		} else if(state == CITYHALL_UNSELECTED) {
-	
-			cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.fireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.fireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.fireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.fireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));
-			
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.cityHallCell5));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.cityHallCell6));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.cityHallCell3));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.cityHallCell4));
+			layer.getCell(row, col + 2).setTile(new StaticTiledMapTile(Assets.cityHallCell1));
+			layer.getCell(row + 1, col + 2).setTile(new StaticTiledMapTile(Assets.cityHallCell2));
 			state = CITYHALL_OK;
-		}*/
+		}
 	}
 	
 	public void createShape() {
-		this.col = col; 
-		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
-	    float[] vertices = new float[12];
+	    float[] vertices = new float[20];
 	    vertices[0] = screenx;   vertices[1] = screeny;
 	    vertices[2] = screenx + 64; vertices[3] = screeny - 32;
-	    vertices[4] = screenx + 128; vertices[5] = screeny;
-	    vertices[6] = screenx + 128; vertices[7] = screeny + 32;
-	    vertices[8] = screenx + 64; vertices[9] = screeny - 32 + 128;
-	    vertices[10] = screenx; vertices[11] = screeny + 64;
+	    vertices[4] = screenx + 160; vertices[5] = screeny + 16;
+	    vertices[6] = screenx + 160 - 13; vertices[7] = screeny + 22;
+	    vertices[8] = screenx + 160 - 13; vertices[9] = screeny + 22 + 40;
+	    vertices[10] = screenx + 160 - 7; vertices[11] = screeny + 16 + 49;
+	    vertices[12] = screenx + 97; vertices[13] = screeny + 95;
+	    vertices[14] = screenx + 63; vertices[15] = screeny + 95;
+	    vertices[16] = screenx + 31; vertices[17] = screeny + 88;
+	    vertices[18] = screenx; vertices[19] = screeny + 48;
 		shape = new Polygon(vertices);
 	}
 	
@@ -136,20 +128,12 @@ public class CityHall extends Building {
 
 	@Override
 	public int getZIndex() {
-		// TODO Auto-generated method stub
-		return 0;
+		return zIndex;
 	}
 
 	@Override
 	public void setZIndex(int zIndex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getPeopleSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		this.zIndex = zIndex;
 	}
 
 	@Override
@@ -161,19 +145,16 @@ public class CityHall extends Building {
 	public void setPowered(boolean isPowered) {
 		this.isPowered = isPowered;
 	}
-
+	
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
 		return CITYHALL_HEIGHT;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
 		return CITYHALL_WIDTH;
 	}
-	
-	
+
 }
 

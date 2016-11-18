@@ -21,8 +21,7 @@ public class Bar extends Building {
 	public static final int BAR_DESTROYED = 4;
 	public static final int BAR_HEIGHT = 2;
 	public static final int BAR_WIDTH = 2;
-	
-	TiledMapTileLayer.Cell[] cell;
+
 	boolean isPowered;
 	int state;
 	int zIndex;
@@ -33,13 +32,11 @@ public class Bar extends Building {
 	  
 	public Bar(int row, int col) {
 		super(10000, 500);
-		
 		state = 0;
 		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		cell = new TiledMapTileLayer.Cell[6];
-		lords = new ArrayList<Citizen>(10); // default 10 firefighters at start
+		lords = new ArrayList<Citizen>(10);
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
@@ -68,7 +65,6 @@ public class Bar extends Building {
 			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.barCell4));;
 			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.barCell1));;
 			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.barCell2));;
-		
 			state = BAR_OK;
 		}
 	}
@@ -76,13 +72,14 @@ public class Bar extends Building {
 	public void createShape() {
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
-	    float[] vertices = new float[12];
+	    float[] vertices = new float[14];
 	    vertices[0] = screenx;   vertices[1] = screeny;
 	    vertices[2] = screenx + 64; vertices[3] = screeny - 32;
 	    vertices[4] = screenx + 128; vertices[5] = screeny;
-	    vertices[6] = screenx + 128; vertices[7] = screeny + 32;
-	    vertices[8] = screenx + 64; vertices[9] = screeny - 32 + 128;
-	    vertices[10] = screenx; vertices[11] = screeny + 64;
+	    vertices[6] = screenx + 120; vertices[7] = screeny + 5;
+	    vertices[8] = screenx + 120; vertices[9] = screeny + 31;
+	    vertices[10] = screenx + 64; vertices[11] = screeny - 32 + 128;
+	    vertices[12] = screenx; vertices[13] = screeny + 64;
 		shape = new Polygon(vertices);
 	}
 	
@@ -116,12 +113,10 @@ public class Bar extends Building {
 	@Override
 	public void createCollisionShape() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public Polygon getCollisionShape() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -136,12 +131,6 @@ public class Bar extends Building {
 	}
 
 	@Override
-	public int getPeopleSize() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public boolean isPowered() {
 		return isPowered;
 	}
@@ -150,18 +139,15 @@ public class Bar extends Building {
 	public void setPowered(boolean isPowered) {
 		this.isPowered = isPowered;
 	}
-
+	
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
 		return BAR_HEIGHT;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
 		return BAR_WIDTH;
 	}
-	
-	
+
 }

@@ -86,7 +86,6 @@ public class BuildingRedactorWindow extends Group {
 			}
 		}
 	}
-	
 
 	public class GroceryShopRedactor extends Actor {
 		Texture texture1 = new Texture(Gdx.files.internal("data/groceryShopRedactor.png"));
@@ -270,7 +269,7 @@ public class BuildingRedactorWindow extends Group {
 	}
 	
 	public class HospitalRedactor extends Actor {
-		Texture texture1 = new Texture(Gdx.files.internal("data/hospital_redactor.png"));
+		Texture texture1 = new Texture(Gdx.files.internal("data/hospitalRedactor.png"));
 	
 		boolean started = false;
 		public HospitalRedactor() {
@@ -306,7 +305,7 @@ public class BuildingRedactorWindow extends Group {
 	}
 	
 	public class CityHallRedactor extends Actor {
-		Texture texture1 = new Texture(Gdx.files.internal("data/cityHall_redactor.png"));
+		Texture texture1 = new Texture(Gdx.files.internal("data/cityHallRedactor.png"));
 	
 		boolean started = false;
 		public CityHallRedactor() {
@@ -343,7 +342,7 @@ public class BuildingRedactorWindow extends Group {
 	
 	
 	public class HouseRedactor extends Actor {
-		TextureRegion texture2 = new TextureRegion(new Texture("data/block.png"));
+		TextureRegion texture2 = new TextureRegion(new Texture("data/houseRedactor.png"));
 		boolean started = false;
 		public HouseRedactor() {
 			setBounds(getX(), getY(), texture2.getRegionWidth(), texture2.getRegionHeight());
@@ -375,5 +374,144 @@ public class BuildingRedactorWindow extends Group {
 		}
 	}
 	
-
+	public class OilPlantRedactor extends Actor {
+		Texture texture1 = new Texture(Gdx.files.internal("data/oilPlantRedactor.png"));
+	
+		boolean started = false;
+		public OilPlantRedactor() {
+			setWidth(texture1.getWidth());
+			setHeight(texture1.getHeight());
+			setBounds(0, 0, getWidth(), getHeight());
+			setOrigin(getX(), getY());
+			setTouchable(Touchable.enabled);
+			addListener(new InputListener() {
+				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+					((OilPlantRedactor)event.getTarget()).started = true;
+					return true;
+				}
+			});
+		}
+		
+		@Override 
+		public void draw(Batch batch, float parentAlpha) {
+			 batch.setColor(1, 1, 1, parentAlpha);
+			batch.draw(texture1, getX(), getY());
+		}
+		
+		@Override
+		public void act(float delta) {
+			if(started) {
+				GameScreen.state = GameScreen.GAME_REDACTOR_MODE;
+				GameScreen.redactorState = GameScreen.BUILD_OIL_PLANT;
+				Hud.redactorActor.remove();
+				Hud.redactorStep = 0;
+				started = false;
+			}
+		}
+	}
+	public class IronPlantRedactor extends Actor {
+		Texture texture1 = new Texture(Gdx.files.internal("data/ironPlantRedactor.png"));
+	
+		boolean started = false;
+		public IronPlantRedactor() {
+			setWidth(texture1.getWidth());
+			setHeight(texture1.getHeight());
+			setBounds(0, 0, getWidth(), getHeight());
+			setOrigin(getX(), getY());
+			setTouchable(Touchable.enabled);
+			addListener(new InputListener() {
+				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+					((IronPlantRedactor)event.getTarget()).started = true;
+					return true;
+				}
+			});
+		}
+		
+		@Override 
+		public void draw(Batch batch, float parentAlpha) {
+			 batch.setColor(1, 1, 1, parentAlpha);
+			batch.draw(texture1, getX(), getY());
+		}
+		
+		@Override
+		public void act(float delta) {
+			if(started) {
+				GameScreen.state = GameScreen.GAME_REDACTOR_MODE;
+				GameScreen.redactorState = GameScreen.BUILD_IRON_PLANT;
+				Hud.redactorActor.remove();
+				Hud.redactorStep = 0;
+				started = false;
+			}
+		}
+	}
+	public class ParkRedactor extends Actor {
+		Texture texture1 = new Texture(Gdx.files.internal("data/parkRedactor.png"));
+	
+		boolean started = false;
+		public ParkRedactor() {
+			setWidth(texture1.getWidth());
+			setHeight(texture1.getHeight());
+			setBounds(0, 0, getWidth(), getHeight());
+			setOrigin(getX(), getY());
+			setTouchable(Touchable.enabled);
+			addListener(new InputListener() {
+				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+					((ParkRedactor)event.getTarget()).started = true;
+					return true;
+				}
+			});
+		}
+		
+		@Override 
+		public void draw(Batch batch, float parentAlpha) {
+			 batch.setColor(1, 1, 1, parentAlpha);
+			batch.draw(texture1, getX(), getY());
+		}
+		
+		@Override
+		public void act(float delta) {
+			if(started) {
+				GameScreen.state = GameScreen.GAME_REDACTOR_MODE;
+				GameScreen.redactorState = GameScreen.BUILD_PARK;
+				Hud.redactorActor.remove();
+				Hud.redactorStep = 0;
+				started = false;
+			}
+		}
+	}
+	public class WTCRedactor extends Actor {
+		Texture texture1 = new Texture(Gdx.files.internal("data/worldTradeCenterRedactor.png"));
+	
+		boolean started = false;
+		public WTCRedactor() {
+			setWidth(texture1.getWidth());
+			setHeight(texture1.getHeight());
+			setBounds(0, 0, getWidth(), getHeight());
+			setOrigin(getX(), getY());
+			setTouchable(Touchable.enabled);
+			addListener(new InputListener() {
+				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+					((WTCRedactor)event.getTarget()).started = true;
+					return true;
+				}
+			});
+		}
+		
+		@Override 
+		public void draw(Batch batch, float parentAlpha) {
+			 batch.setColor(1, 1, 1, parentAlpha);
+			batch.draw(texture1, getX(), getY());
+		}
+		
+		@Override
+		public void act(float delta) {
+			if(started) {
+				GameScreen.state = GameScreen.GAME_REDACTOR_MODE;
+				GameScreen.redactorState = GameScreen.BUILD_WTC;
+				Hud.redactorActor.remove();
+				Hud.redactorStep = 0;
+				started = false;
+			}
+		}
+	}
 }

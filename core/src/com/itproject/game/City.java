@@ -1,9 +1,13 @@
 package com.itproject.game;
 
-
-import com.badlogic.gdx.Gdx;
+import com.itproject.game.buildings.Bank;
 import com.itproject.game.buildings.Building;
+import com.itproject.game.buildings.Hospital;
 import com.itproject.game.buildings.House;
+import com.itproject.game.buildings.PowerStation;
+import com.itproject.game.buildings.WaterStation;
+import com.itproject.game.buildings.WorldTradeCenter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,7 +43,7 @@ public class City {
 	static float[] expensesStatistics = new float[4];
 
 	CityListener listener;
-	List<Citizen> citizens;
+	public static List<Citizen> citizens;
 	public static List<Building> buildings;
 	List<Road> road;
 
@@ -59,8 +63,11 @@ public class City {
 		this.BPRNG = new BiasedRandom(this);
 		this.worldview = new Worldview(this);
 		this.budget = new Budget(this);
-		City.time = new Time();
-		
+		this.time = new Time();
+
+		//lul
+		this.time.nextDay();
+
 		// Create map generation later
 		// generateMap();
 
@@ -80,21 +87,23 @@ public class City {
 	
 	public void update(float deltaTime) {
 		gameTime += deltaTime;
-		if (gameTime >= 1/200f) {
-			time.nextDay();
+		if (gameTime >= 1f) {
 
             updateCitizens();
 			updatePopulation();
-            updateTime();
 
-            gameTime -= 1/200f;
+            findHouse();
+            findJob();
+
+			updateBuildings();
+			updateTime();
+
+            gameTime -= 1f;
 		}
 
-        updateBuildings();
+		buildings.forEach(Building::updateSelected);
         checkGameOver();
 	}
-
-
 
 	public void loadStatistics() {
 		try {
@@ -241,36 +250,124 @@ public class City {
             }
 		}
 
-		citizens.removeAll(deadCitizens);
+		if (!deadCitizens.isEmpty()) {
+			for (Building building : buildings) {
+				if (building instanceof PowerStation) {
+					((PowerStation) building).employees.removeAll(deadCitizens);
+				} else if (building instanceof WaterStation) {
+					((WaterStation) building).employees.removeAll(deadCitizens);
+				} else if (building instanceof Hospital) {
+					((Hospital) building).doctors.removeAll(deadCitizens);
+				} else if (building instanceof Bank) {
+					((Bank) building).clerks.removeAll(deadCitizens);
+					((Bank) building).bankers.removeAll(deadCitizens);
+				} else if (building instanceof WorldTradeCenter) {
+					((WorldTradeCenter) building).salespeople.removeAll(deadCitizens);
+					((WorldTradeCenter) building).traders.removeAll(deadCitizens);
+				}
+			}
+			citizens.removeAll(deadCitizens);
+		}
+	}
+
+	public void findJob() {
+        Iterator<Building> iterator = buildings.iterator();
+        Building building = (iterator.hasNext()) ? iterator.next() : null;
+
+        if (building != null) {
+            for (Citizen citizen : citizens) {
+                if (citizen.occupation == Citizen.Occupation.UNEMPLOYED) {
+                    do {
+                        if (building instanceof PowerStation) {
+                            if (((PowerStation) building).hireEmployee(citizen)) {
+                                break;
+                            }
+                        } else if (building instanceof WaterStation) {
+                            if (((WaterStation) building).hireEmployee(citizen)) {
+                                break;
+                            }
+                        } else if (building instanceof Hospital) {
+                            if (((Hospital) building).hireEmployee(citizen)) {
+                                break;
+                            }
+                        } else if (building instanceof Bank) {
+                            if (((Bank) building).hireEmployee(citizen)) {
+                                break;
+                            }
+                        }
+
+                        if (!iterator.hasNext()) {
+                            break;
+                        }
+                        building = iterator.next();
+
+                    } while (true);
+
+                    if (!iterator.hasNext()) {
+                        iterator = buildings.iterator();
+                    }
+                    building = iterator.next();
+                }
+            }
+        }
+    }
+
+	public void findHouse() {
+        boolean isSettled;
+
+        Iterator<Building> iterator = buildings.iterator();
+        Building building = (iterator.hasNext()) ? iterator.next() : null;
+
+        for (Citizen citizen : citizens) {
+            if (citizen.house == null) {
+                do {
+                    if (building == null) {
+                        break;
+                    }
+
+                    if (!(building instanceof House)) {
+                        while (iterator.hasNext() && !((building = iterator.next()) instanceof House)) {}
+                    }
+
+                    if (!iterator.hasNext() && !(building instanceof House)) {
+                        break;
+                    }
+
+                    if (citizen.moneySavings < ((House) building).utilityBill) {
+                        break;
+                    }
+
+                    isSettled = ((House) building).settleResident(citizen);
+                    if (!isSettled) {
+                        building = (iterator.hasNext()) ? iterator.next() : null;
+                    } else {
+                        break;
+                    }
+                } while (true);
+            }
+        }
+    }
+
+	private void updateBuildings() {
+		buildings.forEach(building -> {
+			if (building instanceof PowerStation || building instanceof WaterStation) {
+				building.update();
+			}
+		});
+
+		buildings.forEach(building -> {
+			if (!(building instanceof PowerStation) && !(building instanceof WaterStation)) {
+				building.update();
+			}
+		});
 	}
 
 	public void updateTime() {
 		time.nextDay();
 	//	System.out.println(City.time.toString());
 	}
-	
-	public void updateBuildings() {
-		buildings.forEach(Building::update);
-	}
 
 	private void checkGameOver() {
 
 	}
-
-	
-	public boolean findHomeToCitizen() {
-		boolean temp = false;
-		for(Citizen citizen : citizens) {
-			for(Building building : buildings) {
-				if(building instanceof House) {
-					temp = ((House)building).settleResident(citizen);
-				}
-				if(temp == false) {
-					continue;
-				}
-			}
-		}
-		return false;
-
-	}	
 }

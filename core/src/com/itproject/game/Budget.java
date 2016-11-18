@@ -3,6 +3,7 @@ package com.itproject.game;
 import com.itproject.game.buildings.Building;
 import com.itproject.game.buildings.PowerStation;
 import com.itproject.game.buildings.WaterStation;
+import com.itproject.game.buildings.WorldTradeCenter;
 
 import java.util.HashMap;
 
@@ -71,25 +72,16 @@ public class Budget {
     public void recalculateTax(Building building) {
         if (taxationType) {
             for (short upper : progressiveTaxPercentage.keySet()) {
-                if (building instanceof PowerStation) {
-                    if(((PowerStation) building).currentProfit < upper) {
-                        ((PowerStation) building).taxes = (short) Math.round(((PowerStation) building).currentProfit* progressiveTaxPercentage.get(upper) / 100);
-                        break;
-                    }
-                }
-                if (building instanceof WaterStation) {
-                    if(((WaterStation) building).currentProfit < upper) {
-                        ((WaterStation) building).taxes = (short) Math.round(((WaterStation) building).currentProfit* progressiveTaxPercentage.get(upper) / 100);
+                if (building instanceof WorldTradeCenter) {
+                    if(((WorldTradeCenter) building).currentProfit < upper) {
+                        ((WorldTradeCenter) building).taxes = (short) Math.round(((WorldTradeCenter) building).currentProfit* progressiveTaxPercentage.get(upper) / 100);
                         break;
                     }
                 }
             }
         } else {
-            if (building instanceof PowerStation) {
-                ((PowerStation) building).taxes = (short) Math.round(((PowerStation) building).currentProfit* fixedTaxPercentage / 100);
-            }
-            if (building instanceof WaterStation) {
-                ((WaterStation) building).taxes = (short) Math.round(((WaterStation) building).currentProfit* fixedTaxPercentage / 100);
+            if (building instanceof WorldTradeCenter) {
+                ((WorldTradeCenter) building).taxes = (short) Math.round(((WorldTradeCenter) building).currentProfit* fixedTaxPercentage / 100);
             }
         }
     }

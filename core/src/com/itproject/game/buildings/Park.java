@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
@@ -21,23 +22,24 @@ public class Park extends Building {
 	public static final int PARK_HEIGHT = 3;
 	public static final int PARK_WIDTH = 3;
 	
-	TiledMapTileLayer.Cell[] cell;
 	int state;
 	private int col, row;
 	private Polygon shape;
 	List<Citizen> camper;
 	TiledMapTileLayer layer;
-	  
+	int zIndex;
+	boolean isPowered;
+	
 	public Park(int row, int col) {
 		super(10000, 500);
 		
 		state = 0;
-		
+		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		cell = new TiledMapTileLayer.Cell[6];
-		camper = new ArrayList<Citizen>(10); // default 10 firefighters at start
-		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
+		isPowered = false;
+		camper = new ArrayList<Citizen>(10);
+		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
 	public void update() {
@@ -55,45 +57,40 @@ public class Park extends Building {
 	}
 
 	public void updateSelected() {
-		/*if(state == PARK_SELECTED) {
-			cell[0] = layer.getCell(row, col);
-			cell[1] = layer.getCell(row + 1, col);
-			cell[2] = layer.getCell(row, col + 1);
-			cell[3] = layer.getCell(row + 1, col + 1);
-			cell[4] = layer.getCell(row, col + 2);
-			cell[5] = layer.getCell(row + 1, col + 2);
-			
-			cell[0].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));
+		if(state == PARK_SELECTED) {
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.parkSelectedCell7));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.parkSelectedCell8));
+			layer.getCell(row + 2, col).setTile(new StaticTiledMapTile(Assets.parkSelectedCell9));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.parkSelectedCell4));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.parkSelectedCell5));
+			layer.getCell(row + 2, col + 1).setTile(new StaticTiledMapTile(Assets.parkSelectedCell6));
+			layer.getCell(row, col + 2).setTile(new StaticTiledMapTile(Assets.parkSelectedCell1));
+			layer.getCell(row + 1, col + 2).setTile(new StaticTiledMapTile(Assets.parkSelectedCell2));
+			layer.getCell(row + 2, col + 2).setTile(new StaticTiledMapTile(Assets.parkSelectedCell3));
 		} else if(state == PARK_UNSELECTED) {
-	
-			cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.fireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.fireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.fireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.fireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));
-			
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.parkCell7));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.parkCell8));
+			layer.getCell(row + 2, col).setTile(new StaticTiledMapTile(Assets.parkCell9));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.parkCell4));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.parkCell5));
+			layer.getCell(row + 2, col + 1).setTile(new StaticTiledMapTile(Assets.parkCell6));
+			layer.getCell(row, col + 2).setTile(new StaticTiledMapTile(Assets.parkCell1));
+			layer.getCell(row + 1, col + 2).setTile(new StaticTiledMapTile(Assets.parkCell2));
+			layer.getCell(row + 2, col + 2).setTile(new StaticTiledMapTile(Assets.parkCell3));
 			state = PARK_OK;
-		}*/
+		}
 	}
 	
 	public void createShape() {
-		this.col = col; 
-		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
 	    float[] vertices = new float[12];
 	    vertices[0] = screenx;   vertices[1] = screeny;
-	    vertices[2] = screenx + 64; vertices[3] = screeny - 32;
-	    vertices[4] = screenx + 128; vertices[5] = screeny;
-	    vertices[6] = screenx + 128; vertices[7] = screeny + 32;
-	    vertices[8] = screenx + 64; vertices[9] = screeny - 32 + 128;
-	    vertices[10] = screenx; vertices[11] = screeny + 64;
+	    vertices[2] = screenx + 96; vertices[3] = screeny - 47;
+	    vertices[4] = screenx + 192; vertices[5] = screeny;
+	    vertices[6] = screenx + 192; vertices[7] = screeny + 10;
+	    vertices[8] = screenx + 96; vertices[9] = screeny + 64 + 8;
+	    vertices[10] = screenx; vertices[11] = screeny + 8;
 		shape = new Polygon(vertices);
 	}
 	
@@ -138,43 +135,31 @@ public class Park extends Building {
 
 	@Override
 	public int getZIndex() {
-		// TODO Auto-generated method stub
-		return 0;
+		return zIndex;
 	}
 
 	@Override
 	public void setZIndex(int zIndex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getPeopleSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		this.zIndex = zIndex;
 	}
 
 	@Override
 	public boolean isPowered() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void setPowered(boolean isPowered) {
-		// TODO Auto-generated method stub
-		
+		this.isPowered = isPowered;
 	}
 
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
 		return PARK_HEIGHT;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
 		return PARK_WIDTH;
 	}
 	

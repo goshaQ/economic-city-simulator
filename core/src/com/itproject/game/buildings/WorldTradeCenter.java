@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.City;
 import com.itproject.game.Hud;
 
 public class WorldTradeCenter extends Building {
@@ -18,33 +20,36 @@ public class WorldTradeCenter extends Building {
 	public static final int WTC_SELECTED = 2;
 	public static final int WTC_UNSELECTED = 3;
 	public static final int WTC_DESTROYED = 4;
-	public static final int WTC_HEIGHT = 3;
-	public static final int WTC_WIDTH = 3;
+	public static final int WTC_HEIGHT = 2;
+	public static final int WTC_WIDTH = 2;
 
-	TiledMapTileLayer.Cell[] cell;
 	boolean isPowered;
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> officeClerks;
-	List<Citizen> traders;
+	public List<Citizen> salespeople;
+	public List<Citizen> traders;
 	TiledMapTileLayer layer;
-	  
+	int zIndex;
+	
 	public WorldTradeCenter(int row, int col) {
 		super(10000, 500);
 		
 		state = 0;
-		
+		this.zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		cell = new TiledMapTileLayer.Cell[6];
-		officeClerks = new ArrayList<Citizen>(10); // default 10 firefighters at start
-		traders = new ArrayList<Citizen>(10);
-		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get(0);
+		salespeople = new ArrayList<>();
+		traders = new ArrayList<>();
+		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
 	public void update() {
 		updateSelected();
+		tradeOnStockExchange();
+		if (City.time.getDay() == 1) {
+			calculateProfit();
+		}
 	}
 
 	@Override
@@ -58,36 +63,21 @@ public class WorldTradeCenter extends Building {
 	}
 
 	public void updateSelected() {
-		/*if(state == WTC_SELECTED) {
-			cell[0] = layer.getCell(row, col);
-			cell[1] = layer.getCell(row + 1, col);
-			cell[2] = layer.getCell(row, col + 1);
-			cell[3] = layer.getCell(row + 1, col + 1);
-			cell[4] = layer.getCell(row, col + 2);
-			cell[5] = layer.getCell(row + 1, col + 2);
-			
-			cell[0].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.selectedFireStationCell2));
+		if(state == WTC_SELECTED) {
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.wtcSelectedCell3));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.wtcSelectedCell4));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.wtcSelectedCell1));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.wtcSelectedCell2));
 		} else if(state == WTC_UNSELECTED) {
-	
-			cell[0].setTile(new StaticTiledMapTile(Assets.fireStationCell5));
-			cell[1].setTile(new StaticTiledMapTile(Assets.fireStationCell6));
-			cell[2].setTile(new StaticTiledMapTile(Assets.fireStationCell3));
-			cell[3].setTile(new StaticTiledMapTile(Assets.fireStationCell4));
-			cell[4].setTile(new StaticTiledMapTile(Assets.fireStationCell1));
-			cell[5].setTile(new StaticTiledMapTile(Assets.fireStationCell2));
-			
+			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.wtcCell3));
+			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.wtcCell4));
+			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.wtcCell1));
+			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.wtcCell2));
 			state = WTC_OK;
-		}*/
+		}
 	}
 	
 	public void createShape() {
-		this.col = col; 
-		this.row = row;
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
 	    float[] vertices = new float[12];
@@ -100,6 +90,90 @@ public class WorldTradeCenter extends Building {
 		shape = new Polygon(vertices);
 	}
 	
+	final float baseExpenseRate = (float) 0.16;
+	final short serviceBill = 24000;
+	final short sellerSalary = 2800;
+	final short traderSalary = 6600;
+	final short sellersLimit = 210;
+	final short bankersLimit = 90;
+
+	short purchasePrice;
+	short basePurchasePrice;
+	int capital;
+	int numberOfVisits;
+	public int currentProfit;
+	public short taxes;
+
+	public boolean hireEmployee(Citizen employee) {
+		if (salespeople.size() < sellersLimit) {
+			salespeople.add(employee);
+
+			employee.salary = sellerSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.SELLER;
+		} else if(traders.size() < bankersLimit) {
+			traders.add(employee);
+
+			employee.salary = traderSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.TRADER;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void calculateProfit() {
+		City.budget.recalculateTax(this);
+		City.budget.changeBudget(taxes);
+
+		capital += currentProfit - taxes -
+				(electricityBill + waterBill + serviceBill + salespeople.size() * sellerSalary + traders.size() * traderSalary);
+
+		currentProfit = numberOfVisits = 0;
+	}
+
+	public short visitWTC(Citizen citizen) {
+		calculateExpenses(citizen);
+		if (citizen.moneySavings >= purchasePrice) {
+			currentProfit += purchasePrice;
+			numberOfVisits++;
+
+			return purchasePrice;
+		}
+
+		return 0;
+	}
+
+	private void calculateExpenses(Citizen citizen) {
+		purchasePrice = (short) Math.round((City.PRNG.nextFloat() * 0.08 + baseExpenseRate) * citizen.salary);
+	}
+
+	public void tradeOnStockExchange() {
+		float[] profitProbability = new float[3];
+		profitProbability[0] = (float) 0.55;
+		profitProbability[1] = (float) 0.1;
+		profitProbability[2] = (float) 0.35;
+
+		int bet = (int) Math.round(capital * 0.01);
+
+		for (Citizen trader : traders) {
+			for (int i = 0; i < 3; i++) {
+				switch (City.BPRNG.nextByte(profitProbability, (short) 100)) {
+					case 0:
+						currentProfit += bet;
+						break;
+					case 1:
+						break;
+					case 2:
+						currentProfit -= bet;
+						break;
+				}
+			}
+		}
+	}
+
 	public int getState() {
 		return state;
 	}
@@ -140,20 +214,12 @@ public class WorldTradeCenter extends Building {
 
 	@Override
 	public int getZIndex() {
-		// TODO Auto-generated method stub
-		return 0;
+		return zIndex;
 	}
 
 	@Override
 	public void setZIndex(int zIndex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getPeopleSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		this.zIndex = zIndex;
 	}
 
 	@Override
@@ -178,6 +244,5 @@ public class WorldTradeCenter extends Building {
 		// TODO Auto-generated method stub
 		return WTC_WIDTH;
 	}
-	
-	
+
 }

@@ -39,7 +39,7 @@ public class FireStation extends Building {
 		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		firefighters = new ArrayList<Citizen>(10); // default 10 firefighters at start
+		firefighters = new ArrayList<Citizen>(10);
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
@@ -73,7 +73,6 @@ public class FireStation extends Building {
 			layer.getCell(row + 1, col).setTile(new StaticTiledMapTile(Assets.fireStationCell4));
 			layer.getCell(row, col + 1).setTile(new StaticTiledMapTile(Assets.fireStationCell1));
 			layer.getCell(row + 1, col + 1).setTile(new StaticTiledMapTile(Assets.fireStationCell2));
-			
 			state = FIRE_STATION_OK;
 		}
 	}
@@ -138,7 +137,6 @@ public class FireStation extends Building {
 
 	@Override
 	public Polygon getCollisionShape() {
-		// TODO Auto-generated method stub
 		return collisionShape;
 	}
 	
@@ -152,10 +150,6 @@ public class FireStation extends Building {
 		return this.zIndex;
 	}
 	
-	public int getPeopleSize() {
-		return firefighters.size(); 
-	}
-
 	@Override
 	public boolean isPowered() {
 		return isPowered;
@@ -165,18 +159,15 @@ public class FireStation extends Building {
 	public void setPowered(boolean isPowered) {
 		this.isPowered = isPowered;
 	}
-
+	
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
 		return FIRE_STATION_HEIGHT;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
 		return FIRE_STATION_WIDTH;
 	}
-	
 
 }

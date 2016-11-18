@@ -32,28 +32,29 @@ public class PowerStation extends Building{
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> worker;
+	//List<Citizen> worker;
 	TiledMapTileLayer layer;
-
-	List<Building> powerConsumers;
-
+	int zIndex;
+	
 	public PowerStation(int row, int col) {
 		super(10000, 500);
 		
 		state = 0;
-		
+		zIndex = 100 - col + row;
 		isPowered = true;
 		this.col = col;
 		this.row = row;
 		cell = new TiledMapTileLayer.Cell[6];
-		worker = new ArrayList<Citizen>(10); // default 10 firefighters at start
+		employees = new ArrayList<Citizen>(10); // default 10 firefighters at start
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
-		powerConsumers = new ArrayList<Building>(POWER_CONSUMERS_LIMIT);
+		buildings = new ArrayList<Building>(POWER_CONSUMERS_LIMIT);
 		initializePowerConsumers();
 	}
 	
 	public void update() {
-		updateSelected();
+		if (City.time.getDay() == 1) {
+			calculateBIll();
+		}
 	}
 
 	@Override
@@ -94,13 +95,17 @@ public class PowerStation extends Building{
 	public void createShape() {
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
-	    float[] vertices = new float[12];
+	    float[] vertices = new float[20];
 	    vertices[0] = screenx;   vertices[1] = screeny;
 	    vertices[2] = screenx + 96; vertices[3] = screeny - 47;
 	    vertices[4] = screenx + 192; vertices[5] = screeny;
-	    vertices[6] = screenx + 192; vertices[7] = screeny + 64;
-	    vertices[8] = screenx + 96; vertices[9] = screeny - 47 + 192;
-	    vertices[10] = screenx; vertices[11] = screeny + 64;
+	    vertices[6] = screenx + 160; vertices[7] = screeny + 81;
+	    vertices[8] = screenx + 141; vertices[9] = screeny + 74;
+	    vertices[10] = screenx + 107; vertices[11] = screeny + 106;
+	    vertices[12] = screenx + 95; vertices[13] = screeny + 109;
+	    vertices[14] = screenx + 16; vertices[15] = screeny + 72;
+	    vertices[16] = screenx + 15; vertices[17] = screeny + 72 - 16;
+	    vertices[18] = screenx; vertices[19] = screeny + 64;
 		shape = new Polygon(vertices);
 	}
 	
@@ -145,20 +150,12 @@ public class PowerStation extends Building{
 
 	@Override
 	public int getZIndex() {
-		// TODO Auto-generated method stub
-		return 0;
+		return zIndex;
 	}
 
 	@Override
 	public void setZIndex(int zIndex) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public int getPeopleSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		this.zIndex = zIndex;
 	}
 
 	public void initializePowerConsumers() {
@@ -167,7 +164,7 @@ public class PowerStation extends Building{
 			   || (building.getCol() + building.getHeight() - 1 >= this.col - POWER_RADIUS && building.getCol() + building.getHeight() - 1 <= this.col + POWER_RADIUS + this.getHeight() - 1
 			   && building.getRow() + building.getWidth() - 1 >= this.row - POWER_RADIUS && building.getRow() + building.getWidth() - 1 <= this.row + POWER_RADIUS + this.getWidth() - 1 ))
 			   && building.isPowered() == false) {
-				powerConsumers.add(building);
+				buildings.add(building);
 				building.setPowered(true);
 				System.out.println(building.getClass().getName() + "\n");
 			}
@@ -186,11 +183,11 @@ public class PowerStation extends Building{
 	}
 
 	public void addPowerConsumer(Building building) {
-		powerConsumers.add(building);
+		buildings.add(building);
 	}
 
 	public List<Building> getPowerConsumers() {
-		return powerConsumers;
+		return buildings;
 	}
 
 	@Override
@@ -217,7 +214,7 @@ public class PowerStation extends Building{
 	public short taxes;
 
 	List<Building> buildings;
-	List<Citizen> employees;
+	public List<Citizen> employees;
 
 	public boolean attachBuilding(Building building) {
 		if (buildings.size() <= buildingsLimit) {
@@ -232,6 +229,7 @@ public class PowerStation extends Building{
 	}
 
 	public boolean hireEmployee(Citizen employee) {
+		
 		if (employees.size() <= Math.ceil(buildings.size() / 2) * employeeLimitForBlock) {
 			employees.add(employee);
 

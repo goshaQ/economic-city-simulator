@@ -26,11 +26,11 @@ abstract public class Building {
 	abstract public void showInfo(float screenX, float screenY);
 	abstract public void setState(int state);
 	abstract public void update();
+	abstract public void updateSelected();
 	abstract public void setElectricityBill(short electricityBill);
 	abstract public void setWaterBill(short waterBill);
 	abstract public int getZIndex();
 	abstract public void setZIndex(int zIndex);
-	abstract public int getPeopleSize();
 	abstract public boolean isPowered();
 	abstract public void setPowered(boolean isPowered);
 	abstract public int getHeight();
