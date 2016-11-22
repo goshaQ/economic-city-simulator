@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.City;
 import com.itproject.game.Hud;
 
 public class IronPlant extends Building {
@@ -20,36 +21,43 @@ public class IronPlant extends Building {
 	public static final int IRON_PLANT_DESTROYED = 4;
 	public static final int IRON_PLANT_HEIGHT = 3;
 	public static final int IRON_PLANT_WIDTH = 3;
-	
+
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> lords;
 	TiledMapTileLayer layer;
 	int zIndex;
-	
+
 	public IronPlant(int row, int col) {
-		super(10000, 500);
+		super(1000000, 500);
+
 		state = 0;
 		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		lords = new ArrayList<Citizen>(10); 
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
+		workers = new ArrayList<>(); // default 10 firefighters at start
+		amountOfIronPerDay = 20;
+		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
+		capital = 80000;
 	}
 	
 	public void update() {
-		updateSelected();
+		produceResource();
+		if (City.time.getDay() == 1) {
+			calculateProfit();
+		}
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		this.electricityBill = electricityBill;
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		this.waterBill = waterBill;
 	}
 
@@ -117,6 +125,9 @@ public class IronPlant extends Building {
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 
 		System.out.println("It is a IRON_PLANT!!");
@@ -153,7 +164,7 @@ public class IronPlant extends Building {
 	public void setPowered(boolean isPowered) {
 		this.isPowered = isPowered;
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return IRON_PLANT_HEIGHT;
@@ -164,4 +175,119 @@ public class IronPlant extends Building {
 		return IRON_PLANT_WIDTH;
 	}
 
+	public List<Citizen> workers;
+
+	public final short workersLimit = 120;
+	public final short serviceBill = 30000;
+	public final short workerSalary = 4200;
+	public final short basePriceForIron = 10; //unknown
+
+	public int expensesLastMonth;
+	public int currentProfit;
+	public int capital;
+	public int taxes;
+
+	public short amountOfIron;
+	public short amountOfIronPerDay;
+	public short priceForIron;
+
+	public boolean hireEmployee(Citizen employee) {
+		if (workers.size() < workersLimit) {
+			workers.add(employee);
+
+			employee.salary = workerSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.IRONPLANTWORKER;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void calculateProfit() {
+		calculatePriceForResource();
+		currentProfit = amountOfIron * priceForIron;
+
+		City.budget.recalculateTax(this);
+		City.budget.changeBudget(taxes);
+
+		workers.forEach(Citizen::getSalary);
+
+		expensesLastMonth = taxes +
+				(electricityBill + waterBill + serviceBill + workers.size() * workerSalary);
+		capital += currentProfit - expensesLastMonth;
+
+		int desiredProfit = (int) Math.round(capital * 0.018);
+		int profitPerDay = (desiredProfit + expensesLastMonth) / City.time.days[City.time.getMonth() - 1];
+		amountOfIronPerDay = (short) ((profitPerDay / priceForIron) / workers.size());
+
+		System.out.println("Desired volume of iron per day in next month: " + amountOfIronPerDay);
+		System.out.println("Needed profit per day: " + profitPerDay);
+		System.out.println("Expenses could be: " + expensesLastMonth / City.time.days[City.time.getMonth() - 1]);
+
+		System.out.println("Iron Plant has payed taxes: " + taxes);
+		System.out.println("Number of workers in Iron Plant: " + workers.size());
+		System.out.println("Current capital of Iron Plant: " + capital);
+		System.out.println("Last month Oil Plant earned: " + currentProfit);
+		System.out.println("Price for one unit of iron last month was: " + priceForIron);
+		System.out.println("");
+
+		amountOfIron = 0;
+	}
+
+	public void calculatePriceForResource() {
+		float[] priceProbability = new float[3];
+		priceProbability[0] = 0.6f;
+		priceProbability[1] = 0.2f;
+		priceProbability[2] = 0.2f;
+
+		switch (City.BPRNG.nextByte(priceProbability, (short) 100)) {
+			case 0:
+				priceForIron = (short) (City.PRNG.nextInt(8) + basePriceForIron);
+				break;
+			case 1:
+				priceForIron = (short) (City.PRNG.nextInt(8) + City.PRNG.nextInt(5) + basePriceForIron);
+				break;
+			case 2:
+				priceForIron = (short) (City.PRNG.nextInt(8) - City.PRNG.nextInt(5) + basePriceForIron);
+				break;
+		}
+	}
+
+	public void produceResource() {
+		float[] produceAmountProbability = new float[4];
+		produceAmountProbability[0] = 0.35f;
+		produceAmountProbability[1] = 0.2f;
+		produceAmountProbability[2] = 0.25f;
+		produceAmountProbability[3] = 0.2f;
+
+
+		for (Citizen worker : workers) {
+			amountOfIron += amountOfIronPerDay;
+			switch (City.BPRNG.nextByte(produceAmountProbability, (short) 100)) {
+				case 0:
+					amountOfIron += amountOfIronPerDay * 0.25f;
+					break;
+				case 1:
+					amountOfIron -= amountOfIronPerDay * 0.6f;
+					break;
+				case 2:
+					amountOfIron += amountOfIronPerDay * 0.45f;
+					break;
+				case 3:
+					amountOfIron -= amountOfIronPerDay * 0.15f;
+			}
+		}
+	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
+	}
 }

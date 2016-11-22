@@ -24,6 +24,7 @@ public class WorldTradeCenter extends Building {
 	public static final int WTC_WIDTH = 2;
 
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	private int col, row;
 	private Polygon shape;
@@ -31,9 +32,9 @@ public class WorldTradeCenter extends Building {
 	public List<Citizen> traders;
 	TiledMapTileLayer layer;
 	int zIndex;
-	
+
 	public WorldTradeCenter(int row, int col) {
-		super(10000, 500);
+		super(800000, 500);
 		
 		state = 0;
 		this.zIndex = 100 - col + row;
@@ -41,11 +42,11 @@ public class WorldTradeCenter extends Building {
 		this.row = row;
 		salespeople = new ArrayList<>();
 		traders = new ArrayList<>();
+		capital = 40000;
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
 	public void update() {
-		updateSelected();
 		tradeOnStockExchange();
 		if (City.time.getDay() == 1) {
 			calculateProfit();
@@ -53,12 +54,12 @@ public class WorldTradeCenter extends Building {
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		this.electricityBill = electricityBill;
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		this.waterBill = waterBill;
 	}
 
@@ -90,90 +91,6 @@ public class WorldTradeCenter extends Building {
 		shape = new Polygon(vertices);
 	}
 	
-	final float baseExpenseRate = (float) 0.16;
-	final short serviceBill = 24000;
-	final short sellerSalary = 2800;
-	final short traderSalary = 6600;
-	final short sellersLimit = 210;
-	final short bankersLimit = 90;
-
-	short purchasePrice;
-	short basePurchasePrice;
-	int capital;
-	int numberOfVisits;
-	public int currentProfit;
-	public short taxes;
-
-	public boolean hireEmployee(Citizen employee) {
-		if (salespeople.size() < sellersLimit) {
-			salespeople.add(employee);
-
-			employee.salary = sellerSalary;
-			employee.isSalaryChanged = true;
-			employee.occupation = Citizen.Occupation.SELLER;
-		} else if(traders.size() < bankersLimit) {
-			traders.add(employee);
-
-			employee.salary = traderSalary;
-			employee.isSalaryChanged = true;
-			employee.occupation = Citizen.Occupation.TRADER;
-		} else {
-			return false;
-		}
-
-		return true;
-	}
-
-	public void calculateProfit() {
-		City.budget.recalculateTax(this);
-		City.budget.changeBudget(taxes);
-
-		capital += currentProfit - taxes -
-				(electricityBill + waterBill + serviceBill + salespeople.size() * sellerSalary + traders.size() * traderSalary);
-
-		currentProfit = numberOfVisits = 0;
-	}
-
-	public short visitWTC(Citizen citizen) {
-		calculateExpenses(citizen);
-		if (citizen.moneySavings >= purchasePrice) {
-			currentProfit += purchasePrice;
-			numberOfVisits++;
-
-			return purchasePrice;
-		}
-
-		return 0;
-	}
-
-	private void calculateExpenses(Citizen citizen) {
-		purchasePrice = (short) Math.round((City.PRNG.nextFloat() * 0.08 + baseExpenseRate) * citizen.salary);
-	}
-
-	public void tradeOnStockExchange() {
-		float[] profitProbability = new float[3];
-		profitProbability[0] = (float) 0.55;
-		profitProbability[1] = (float) 0.1;
-		profitProbability[2] = (float) 0.35;
-
-		int bet = (int) Math.round(capital * 0.01);
-
-		for (Citizen trader : traders) {
-			for (int i = 0; i < 3; i++) {
-				switch (City.BPRNG.nextByte(profitProbability, (short) 100)) {
-					case 0:
-						currentProfit += bet;
-						break;
-					case 1:
-						break;
-					case 2:
-						currentProfit -= bet;
-						break;
-				}
-			}
-		}
-	}
-
 	public int getState() {
 		return state;
 	}
@@ -196,6 +113,9 @@ public class WorldTradeCenter extends Building {
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 		System.out.println("It is a WTC!!");
 	}
@@ -243,6 +163,122 @@ public class WorldTradeCenter extends Building {
 	public int getWidth() {
 		// TODO Auto-generated method stub
 		return WTC_WIDTH;
+	}
+
+	public final float baseExpenseRate = (float) 0.12;
+	public final short serviceBill = 18000;
+	public final short sellerSalary = 2800;
+	public final short traderSalary = 6600;
+	public final short sellersLimit = 90;
+	public final short bankersLimit = 60;
+
+	public short purchasePrice;
+	public int capital;
+	public int bet = 2800;
+
+	int[] averageCheck = new int[2];
+	public int expensesLastMonth;
+	public int currentProfit;
+	public int taxes;
+
+	public boolean hireEmployee(Citizen employee) {
+		if (salespeople.size() < sellersLimit) {
+			salespeople.add(employee);
+
+			employee.salary = sellerSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.SELLER;
+		} else if(traders.size() < bankersLimit) {
+			traders.add(employee);
+
+			employee.salary = traderSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.TRADER;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void calculateProfit() {
+		City.budget.recalculateTax(this);
+		City.budget.changeBudget(taxes);
+
+		salespeople.forEach(Citizen::getSalary);
+		traders.forEach(Citizen::getSalary);
+
+		expensesLastMonth = taxes +
+				(electricityBill + waterBill + serviceBill + salespeople.size() * sellerSalary + traders.size() * traderSalary);
+		capital += currentProfit - expensesLastMonth;
+
+		int desiredProfit = (int) Math.round(capital * 0.01);
+		int profitPerDay = ((desiredProfit - averageCheck[0]) + expensesLastMonth) / City.time.days[City.time.getMonth() - 1];
+		bet = Math.round(profitPerDay / (0.2f * traders.size()));
+
+		System.out.println("Desired profit in next month: " + desiredProfit);
+		System.out.println("Needed profit per day: " + profitPerDay);
+		System.out.println("Expenses could be: " + expensesLastMonth / City.time.days[City.time.getMonth() - 1]);
+
+		System.out.println("WTC has payed taxes: " + taxes);
+		System.out.println("Number of sellers in WTC: " + salespeople.size());
+		System.out.println("Number of traders in WTC: " + traders.size());
+		System.out.println("Current capital of WTC: " + capital);
+		System.out.println("Last month WTC earned: " + currentProfit);
+		System.out.println("Bet in this month: " + bet);
+		System.out.println("Average check for customers was: " + averageCheck[0] / ++averageCheck[1]);
+		System.out.println("");
+
+		currentProfit = averageCheck[0] = averageCheck[1] = 0;
+	}
+
+	public short visitWTC(Citizen citizen) {
+		calculateExpenses(citizen);
+		if (citizen.moneySavings >= purchasePrice) {
+			currentProfit += purchasePrice;
+
+			averageCheck[0] += purchasePrice;
+			averageCheck[1]++;
+
+			return purchasePrice;
+		}
+
+		return 0;
+	}
+
+	private void calculateExpenses(Citizen citizen) {
+		purchasePrice = (short) Math.round((City.PRNG.nextFloat() * 0.08 + baseExpenseRate) * citizen.salary);
+	}
+
+	public void tradeOnStockExchange() {
+		float[] profitProbability = new float[3];
+		profitProbability[0] = (float) 0.55;
+		profitProbability[1] = (float) 0.1;
+		profitProbability[2] = (float) 0.35;
+
+
+		for (Citizen trader : traders) {
+			switch (City.BPRNG.nextByte(profitProbability, (short) 100)) {
+				case 0:
+					currentProfit += bet;
+					break;
+				case 1:
+					break;
+				case 2:
+					currentProfit -= bet;
+					break;
+			}
+		}
+	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
 	}
 
 }

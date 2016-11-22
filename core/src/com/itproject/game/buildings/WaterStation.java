@@ -22,45 +22,64 @@ public class WaterStation extends Building {
 	public static final int WATER_STATION_DESTROYED = 4;
 	public static final int WATER_STATION_HEIGHT = 1;
 	public static final int WATER_STATION_WIDTH = 1;
-
+	
+	public static final int WATER_RADIUS = 12;
+	public static final int WATER_CONSUMER_LIMIT = 8;
+	
 	boolean isPowered;
+	boolean isWatered;
+	
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> worker;
 	TiledMapTileLayer layer;
 	TiledMapTileLayer statusLayer;
 	int zIndex;
-	
+
 	public WaterStation(int row, int col) {
-		super(10000, 500);
+		super(50000, 500);
 		state = 0;
 		zIndex = 100 - col + row;
+		isWatered = true;
 		this.col = col;
 		this.row = row;
-		worker = new ArrayList<Citizen>(10); 
+		buildings = new ArrayList<Building>(WATER_CONSUMER_LIMIT);
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 		statusLayer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("statusLayer");
 		employees = new ArrayList<Citizen>(10);
+		initializeWaterConsumers();
 	}
 	
 	public void update() {
-		updateSelected();
 		if (City.time.getDay() == 1) {
 			calculateBIll();
 		}
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		//not used for WaterStation
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		//not used for WaterStation
 	}
+	
 
+	public void initializeWaterConsumers() {
+		for(Building building : City.buildings) {
+			if(((building.getCol() >= this.col - WATER_RADIUS && building.getCol() <= this.col + WATER_RADIUS + this.getHeight() - 1 && building.getRow() >= this.row - WATER_RADIUS && building.getRow() <= this.row + WATER_RADIUS + this.getWidth() - 1)
+			   || (building.getCol() + building.getHeight() - 1 >= this.col - WATER_RADIUS && building.getCol() + building.getHeight() - 1 <= this.col + WATER_RADIUS + this.getHeight() - 1
+			   && building.getRow() + building.getWidth() - 1 >= this.row - WATER_RADIUS && building.getRow() + building.getWidth() - 1 <= this.row + WATER_RADIUS + this.getWidth() - 1 ))
+			   && building.isWatered() == false) {
+				buildings.add(building);
+				building.setWatered(true);
+				System.out.println(building.getClass().getName() + " Watered\n");
+			}
+		}
+	}
+	
 	public void updateSelected() {
 		if(state == WATER_STATION_SELECTED) {
 			layer.getCell(row, col).setTile(new StaticTiledMapTile(Assets.waterStationSelectedCell));
@@ -95,18 +114,18 @@ public class WaterStation extends Building {
 	    vertices[14] = screenx; vertices[15] = screeny + 64;
 		shape = new Polygon(vertices);
 	}
-	
-	final byte buildingsLimit = 8;
-	final byte employeeLimitForBlock = 4;
-	final short employeeSalary = 3200;
-	final short monthlyExpenses = 4000;
-	final short dailyExpenses = 400;
-	final short baseProfitRate = 600;
+
+	public final byte buildingsLimit = 8;
+	public final byte employeeLimitForBlock = 4;
+	public final short employeeSalary = 3200;
+	public final short monthlyExpenses = 4000;
+	public final short dailyExpenses = 400;
+	public final short baseProfitRate = 800;
 
 	public int currentProfit;
 	public short taxes;
 
-	List<Building> buildings;
+	public List<Building> buildings;
 	public List<Citizen> employees;
 
 	public boolean attachBuilding(Building building) {
@@ -136,44 +155,58 @@ public class WaterStation extends Building {
 	}
 
 	public void calculateBIll() {
-		short waterBill;
+		if (!buildings.isEmpty()) {
+			int waterBill;
 
-		calculateMarkup();
-		waterBill = (short) Math.round((City.time.days[City.time.getMonth() - 1] * dailyExpenses + monthlyExpenses
-				+ employees.size() * employeeSalary + currentProfit) / buildings.size());
+			calculateMarkup();
+			waterBill = Math.round((City.time.days[City.time.getMonth() - 1] * dailyExpenses + monthlyExpenses
+					+ employees.size() * employeeSalary + currentProfit) / buildings.size());
 
-		City.budget.changeBudget(currentProfit);
+			System.out.println("Water station calculated water bill: " + waterBill);
+			System.out.println("Daily expenses: " + City.time.days[City.time.getMonth() - 1] * dailyExpenses);
+			System.out.println("Monthly expenses: " + monthlyExpenses);
+			System.out.println("Employee salary: " + employees.size() * employeeSalary);
+			System.out.println("Profit: " + currentProfit);
+			System.out.println("");
 
-		employees.forEach(employee -> employee.getSalary());
-		buildings.forEach(building -> building.setWaterBill(waterBill));
+			City.budget.changeBudget(currentProfit);
+
+			if (!employees.isEmpty()) {
+				employees.forEach(employee -> employee.getSalary());
+			}
+			buildings.forEach(building -> building.setWaterBill(waterBill));
+		}
 	}
 
 	private void calculateMarkup() {
 		currentProfit = (short) ((City.PRNG.nextInt(400) + baseProfitRate) * buildings.size());
 	}
-	
+
 	public int getState() {
 		return state;
 	}
-	
+
 	public void setState(int state) {
 		this.state = state;
 	}
-	
+
 	public Polygon getShape() {
 		return shape;
 	}
-	
+
 	public int getCol() {
 		return col;
 	}
-	
+
 	public int getRow() {
 		return row;
 	}
-	
+
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 
 		System.out.println("It is a Power Station!!");
@@ -182,7 +215,7 @@ public class WaterStation extends Building {
 	@Override
 	public void createCollisionShape() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -221,5 +254,15 @@ public class WaterStation extends Building {
 		return WATER_STATION_WIDTH;
 	}
 
-	
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
+	}
+
+
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.City;
 import com.itproject.game.Hud;
 
 public class Bar extends Building {
@@ -23,6 +24,7 @@ public class Bar extends Building {
 	public static final int BAR_WIDTH = 2;
 
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	int zIndex;
 	private int col, row;
@@ -31,12 +33,12 @@ public class Bar extends Building {
 	TiledMapTileLayer layer;
 	  
 	public Bar(int row, int col) {
-		super(10000, 500);
+		super(300000, 500);
 		state = 0;
 		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		lords = new ArrayList<Citizen>(10);
+		salespeople = new ArrayList<Citizen>(10);
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
@@ -45,12 +47,12 @@ public class Bar extends Building {
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		this.electricityBill = electricityBill;
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		this.waterBill = waterBill;
 	}
 
@@ -105,6 +107,9 @@ public class Bar extends Building {
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 
 		System.out.println("It is a Bar!!");
@@ -150,4 +155,80 @@ public class Bar extends Building {
 		return BAR_WIDTH;
 	}
 
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
+	}
+	
+	public List<Citizen> salespeople;
+
+	public final float baseExpenseRate = (float) 0.16;
+	public final short serviceBill = 3200;
+	public final short sellerSalary = 3600;
+	public final short sellersLimit = 20;
+
+	public short purchasePrice;
+	public int capital;
+
+	public int numberOfVisits;
+	public int expensesLastMonth;
+
+	public int currentProfit;
+	public int taxes;
+
+	public boolean hireEmployee(Citizen employee) {
+		if (salespeople.size() < sellersLimit) {
+			salespeople.add(employee);
+
+			employee.salary = sellerSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.SELLER;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void calculateProfit() {
+		City.budget.recalculateTax(this);
+		City.budget.changeBudget(taxes);
+
+		salespeople.forEach(Citizen::getSalary);
+
+		expensesLastMonth = taxes +
+				(electricityBill + waterBill + serviceBill + salespeople.size() * sellerSalary);
+		capital += currentProfit - expensesLastMonth;
+
+		System.out.println("Bar has payed taxes: " + taxes);
+		System.out.println("Number of sellers in bar: " + salespeople.size());
+		System.out.println("Current capital of bara: " + capital);
+		System.out.println("Last month bar earned: " + currentProfit);
+		System.out.println("Average check for customers was: " + currentProfit / ++numberOfVisits);
+		System.out.println("");
+
+		currentProfit = numberOfVisits = 0;
+	}
+
+	public short visitBar(Citizen citizen) {
+		calculateExpenses(citizen);
+		if (citizen.moneySavings >= purchasePrice) {
+
+			currentProfit += purchasePrice;
+			numberOfVisits++;
+
+			return purchasePrice;
+		}
+
+		return 0;
+	}
+
+	private void calculateExpenses(Citizen citizen) {
+		purchasePrice = (short) Math.round((City.PRNG.nextFloat() * 0.04 + baseExpenseRate) * citizen.salary);
+	}
 }

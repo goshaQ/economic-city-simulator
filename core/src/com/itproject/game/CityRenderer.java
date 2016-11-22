@@ -12,21 +12,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector3;
-import com.itproject.game.buildings.Bank;
-import com.itproject.game.buildings.Bar;
-import com.itproject.game.buildings.Building;
-import com.itproject.game.buildings.CityHall;
-import com.itproject.game.buildings.FireStation;
-import com.itproject.game.buildings.GroceryShop;
-import com.itproject.game.buildings.Hospital;
-import com.itproject.game.buildings.House;
-import com.itproject.game.buildings.IronPlant;
-import com.itproject.game.buildings.OilPlant;
-import com.itproject.game.buildings.Park;
-import com.itproject.game.buildings.PoliceStation;
-import com.itproject.game.buildings.PowerStation;
-import com.itproject.game.buildings.WaterStation;
-import com.itproject.game.buildings.WorldTradeCenter;
+import com.itproject.game.buildings.*;
+
 
 public class CityRenderer {
 	
@@ -77,10 +64,21 @@ public class CityRenderer {
 					if(((col >= building.getCol() - PowerStation.POWER_RADIUS && col <= building.getCol() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_HEIGHT - 1 && row >= building.getRow() - PowerStation.POWER_RADIUS && row <= building.getRow() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_HEIGHT - 1)
 					   || (col + newBuilding.getWidth() - 1 >= building.getCol() - PowerStation.POWER_RADIUS && col + newBuilding.getWidth() - 1 <= building.getCol() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_WIDTH - 1&& row + newBuilding.getWidth() - 1 >= building.getRow() - PowerStation.POWER_RADIUS && row + newBuilding.getWidth() - 1 <= building.getRow() + PowerStation.POWER_RADIUS + PowerStation.POWER_STATION_WIDTH - 1)) 
 					   && newBuilding.isPowered() == false) {
-						((PowerStation)building).addPowerConsumer(newBuilding);
+						((PowerStation)building).attachBuilding(newBuilding);
 						newBuilding.setPowered(true);
 						System.out.println(newBuilding.getClass().getName());
 						break;
+					}
+				}
+				
+				if(building instanceof WaterStation) {
+					if(((col >= building.getCol() - WaterStation.WATER_RADIUS && col <= building.getCol() + WaterStation.WATER_RADIUS + WaterStation.WATER_STATION_HEIGHT - 1 && row >= building.getRow() - WaterStation.WATER_RADIUS && row <= building.getRow() + WaterStation.WATER_RADIUS + WaterStation.WATER_STATION_HEIGHT - 1)
+							   || (col + newBuilding.getWidth() - 1 >= building.getCol() - WaterStation.WATER_RADIUS && col + newBuilding.getWidth() - 1 <= building.getCol() + WaterStation.WATER_RADIUS + WaterStation.WATER_STATION_WIDTH	 - 1&& row + newBuilding.getWidth() - 1 >= building.getRow() - WaterStation.WATER_RADIUS && row + newBuilding.getWidth() - 1 <= building.getRow() + WaterStation.WATER_RADIUS + WaterStation.WATER_STATION_WIDTH - 1)) 
+							   && newBuilding.isWatered() == false) {
+								((WaterStation)building).attachBuilding(newBuilding);
+								newBuilding.setWatered(true);
+								System.out.println(newBuilding.getClass().getName());
+								break;
 					}
 				}
 			}
@@ -384,8 +382,9 @@ public class CityRenderer {
         		house.createShape();
         		house.createCollisionShape();
 	        	City.buildings.add(house);
+	        	City.worldview.assess(house);
 	        	City.budget.changeBudget(-house.cost);
-	        
+	        	
 	        	}
         	}
         				        	
@@ -402,7 +401,6 @@ public class CityRenderer {
         	      if (row == 99 && col == 99) {
 	        	    	fireStation = new FireStation(row - 1, col - 1);
 	        	    	addToTiledMap(row - 1, col - 1, fireStationWidth, fireStationLength, tiles, layer, fireStation);
-	        	    	
         	      } else if (row == 99) {
         	    	fireStation = new FireStation(row - 1, col);
         	    	addToTiledMap(row - 1, col, fireStationWidth, fireStationLength, tiles, layer, fireStation);
@@ -420,6 +418,7 @@ public class CityRenderer {
 	        	fireStation.createCollisionShape();
 	        	City.buildings.add(fireStation);
 	        	City.budget.changeBudget(-fireStation.cost);
+	        	City.worldview.assess(fireStation);
 	        	}
         	}
 			if(GameScreen.redactorState == GameScreen.BUILD_POLICESTATION) {
@@ -453,6 +452,7 @@ public class CityRenderer {
 		    	policeStation.createCollisionShape();
 		    	City.buildings.add(policeStation);
 		    	City.budget.changeBudget(-policeStation.cost);
+		    	City.worldview.assess(policeStation);
 		    	}
 			}
 			if(GameScreen.redactorState == GameScreen.BUILD_POWERSTATION) {
@@ -491,6 +491,7 @@ public class CityRenderer {
 		    	powerStation.createCollisionShape();
 		    	City.buildings.add(powerStation);
 		    	City.budget.changeBudget(-powerStation.cost);
+		    	City.worldview.assess(powerStation);
 		    	}
 			}
 			if(GameScreen.redactorState == GameScreen.BUILD_OIL_PLANT) {
@@ -529,6 +530,7 @@ public class CityRenderer {
 			    oilPlant.createCollisionShape();
 		    	City.buildings.add(oilPlant);
 		    	City.budget.changeBudget(-oilPlant.cost);
+		    	City.worldview.assess(oilPlant);
 		    	}
 			}
 			if(GameScreen.redactorState == GameScreen.BUILD_WTC) {
@@ -544,7 +546,6 @@ public class CityRenderer {
 			      if (row == 99 && col == 99) {
 			    	   wtc = new WorldTradeCenter(row - 1, col - 1);
 		    	    	addToTiledMap(row - 1, col - 1, wtcWidth, wtcLength, tiles, layer, wtc);
-
 			      } else if (row == 99) {
 			    	  wtc = new WorldTradeCenter(row - 1, col);
 			    	  addToTiledMap(row - 1, col, wtcWidth, wtcLength, tiles, layer, wtc);
@@ -562,6 +563,7 @@ public class CityRenderer {
 			      wtc.createCollisionShape();
 		    	City.buildings.add(wtc);
 		    	City.budget.changeBudget(-wtc.cost);
+		    	City.worldview.assess(wtc);
 		    	}
 			}
 			if(GameScreen.redactorState == GameScreen.BUILD_IRON_PLANT) {
@@ -598,6 +600,7 @@ public class CityRenderer {
 			    	ironPlant.createCollisionShape();
 					City.buildings.add(ironPlant);
 					City.budget.changeBudget(-ironPlant.cost);
+					City.worldview.assess(ironPlant);
 				}
 			}
 			if(GameScreen.redactorState == GameScreen.BUILD_PARK) {
@@ -634,6 +637,7 @@ public class CityRenderer {
 			    	park.createCollisionShape();
 					City.buildings.add(park);
 					City.budget.changeBudget(-park.cost);
+					City.worldview.assess(park);
 				}
 			}
 			if(GameScreen.redactorState == GameScreen.BUILD_WATERSTATION) {
@@ -650,6 +654,7 @@ public class CityRenderer {
 	        		waterStation.createCollisionShape();
 		        	City.buildings.add(waterStation);
 		        	City.budget.changeBudget(-waterStation.cost);
+		        	City.worldview.assess(waterStation);
 	        	}
         	}
 			
@@ -680,13 +685,15 @@ public class CityRenderer {
 	        	    	hospital = new Hospital(row, col);
 	        	    	addToTiledMap(row, col, hospitalWidth, hospitalLength, tiles, layer, hospital);
 	        	    }
-	        	    
+
 	        	    hospital.createShape();
 	        	    hospital.createCollisionShape();
 	        	    City.buildings.add(hospital);
 	        	    City.budget.changeBudget(-hospital.cost);
+	        	    City.worldview.assess(hospital);
+
 	        	}
-        	}
+			}
 			
 			if(GameScreen.redactorState == GameScreen.BUILD_BANK) {
 	        	if( (col >= 0 && col < 100) && (row >= 0 && row < 100) ) {	
@@ -719,6 +726,7 @@ public class CityRenderer {
         	      bank.createCollisionShape();
         	      City.buildings.add(bank);
         	      City.budget.changeBudget(-bank.cost);
+        	      City.worldview.assess(bank);
 	        	}
         	}
         	
@@ -753,6 +761,7 @@ public class CityRenderer {
         	      bar.createCollisionShape();
         	      City.buildings.add(bar);
         	      City.budget.changeBudget(-bar.cost);
+        	      City.worldview.assess(bar);
 	        	}
         	}
 			
@@ -785,6 +794,7 @@ public class CityRenderer {
         	      groceryShop.createCollisionShape();
         	      City.buildings.add(groceryShop);
         	      City.budget.changeBudget(-groceryShop.cost);
+        	      City.worldview.assess(groceryShop);
 	        	}
         	}
 			
@@ -801,6 +811,7 @@ public class CityRenderer {
         		waterStation.createCollisionShape();
 	        	City.buildings.add(waterStation);
 	        	City.budget.changeBudget(-waterStation.cost);
+	        	City.worldview.assess(waterStation);
 	        	}
         	}
 			
@@ -837,6 +848,7 @@ public class CityRenderer {
         	      cityHall.createCollisionShape();
 	        	  City.buildings.add(cityHall);
 	        	  City.budget.changeBudget(-cityHall.cost);
+	        	  City.worldview.assess(cityHall);
 	        	}
         	}
 			
@@ -845,9 +857,9 @@ public class CityRenderer {
         		GameScreen.state = GameScreen.GAME_RUNNING;
         	}
         } else {
-        	if(Hud.infoActor != null) {
-        		Hud.infoActor.remove();
-        	}
+        	if(Hud.infoActor != null)
+				Hud.infoActor.remove();
+			
         		
         	List<Building> intersectingBuildings = new ArrayList<Building>();
         	for(Building station : City.buildings) {
@@ -884,5 +896,6 @@ public class CityRenderer {
    }
 };
 	
-
+	
 }
+

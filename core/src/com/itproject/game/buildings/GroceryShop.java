@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.City;
 import com.itproject.game.Hud;
 
 public class GroceryShop extends Building {
@@ -23,6 +24,7 @@ public class GroceryShop extends Building {
 	public static final int GROCERY_SHOP_WIDTH = 1;
 	
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	private int col, row;
 	private Polygon shape;
@@ -31,26 +33,29 @@ public class GroceryShop extends Building {
 	TiledMapTileLayer layer;
 	  
 	public GroceryShop(int row, int col) {
-		super(10000, 500);
+		super(150000, 500);
+		
 		state = 0;
 		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		worker = new ArrayList<Citizen>(10); 
+		salespeople = new ArrayList<>(); // default 10 firefighters at start
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 	}
 	
 	public void update() {
-		updateSelected();
+		if (City.time.getDay() == 1) {
+			calculateProfit();
+		}
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		this.electricityBill = electricityBill;
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		this.waterBill = waterBill;
 	}
 
@@ -101,6 +106,9 @@ public class GroceryShop extends Building {
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 		System.out.println("It is a CityHall!!");
 	}
@@ -126,6 +134,7 @@ public class GroceryShop extends Building {
 		this.zIndex = zIndex;
 	}
 
+
 	@Override
 	public boolean isPowered() {
 		return isPowered;
@@ -135,7 +144,7 @@ public class GroceryShop extends Building {
 	public void setPowered(boolean isPowered) {
 		this.isPowered = isPowered;
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return GROCERY_SHOP_HEIGHT;
@@ -146,4 +155,80 @@ public class GroceryShop extends Building {
 		return GROCERY_SHOP_WIDTH;
 	}
 
+	public List<Citizen> salespeople;
+
+	public final float baseExpenseRate = (float) 0.24;
+	public final short serviceBill = 2000;
+	public final short sellerSalary = 2800;
+	public final short sellersLimit = 20;
+
+	public short purchasePrice;
+	public int capital;
+
+	public int numberOfVisits;
+	public int expensesLastMonth;
+
+	public int currentProfit;
+	public int taxes;
+
+	public boolean hireEmployee(Citizen employee) {
+		if (salespeople.size() < sellersLimit) {
+			salespeople.add(employee);
+
+			employee.salary = sellerSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.SELLER;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void calculateProfit() {
+		City.budget.recalculateTax(this);
+		City.budget.changeBudget(taxes);
+
+		salespeople.forEach(Citizen::getSalary);
+
+		expensesLastMonth = taxes +
+				(electricityBill + waterBill + serviceBill + salespeople.size() * sellerSalary);
+		capital += currentProfit - expensesLastMonth;
+
+		System.out.println("Grocery shop has payed taxes: " + taxes);
+		System.out.println("Number of sellers in grocery shop: " + salespeople.size());
+		System.out.println("Current capital of grocery shop: " + capital);
+		System.out.println("Last month WTC grocery shop: " + currentProfit);
+		System.out.println("Average check for customers was: " + currentProfit / ++numberOfVisits);
+		System.out.println("");
+
+		currentProfit = numberOfVisits = 0;
+	}
+
+	public short visitGroceryShop(Citizen citizen) {
+		calculateExpenses(citizen);
+		if (citizen.moneySavings >= purchasePrice) {
+
+			currentProfit += purchasePrice;
+			numberOfVisits++;
+
+			return purchasePrice;
+		}
+
+		return 0;
+	}
+
+	private void calculateExpenses(Citizen citizen) {
+		purchasePrice = (short) Math.round((City.PRNG.nextFloat() * 0.08 + baseExpenseRate) * citizen.salary);
+	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
+	}
 }

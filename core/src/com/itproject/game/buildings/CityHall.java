@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.Hud;
 
 public class CityHall extends Building {
 
@@ -22,6 +23,7 @@ public class CityHall extends Building {
 	public static final int CITYHALL_WIDTH = 2;
 
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	private int col, row;
 	private Polygon shape;
@@ -30,7 +32,7 @@ public class CityHall extends Building {
 	int zIndex;
 	
 	public CityHall(int row, int col) {
-		super(10000, 500);
+		super(1000000, 500);
 		state = 0;
 		zIndex = 100 - col + row;
 		this.col = col;
@@ -44,12 +46,12 @@ public class CityHall extends Building {
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		this.electricityBill = electricityBill;
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		this.waterBill = waterBill;
 	}
 
@@ -111,6 +113,10 @@ public class CityHall extends Building {
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
+		Hud.setInformationScreen(this, screenX, screenY);
 		System.out.println("It is a CityHall!!");
 	}
 
@@ -154,6 +160,16 @@ public class CityHall extends Building {
 	@Override
 	public int getWidth() {
 		return CITYHALL_WIDTH;
+	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
 	}
 
 }

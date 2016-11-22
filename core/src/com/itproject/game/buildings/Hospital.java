@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
 import com.itproject.game.City;
+import com.itproject.game.Hud;
 
 public class Hospital extends Building{
 
@@ -23,6 +24,7 @@ public class Hospital extends Building{
 	public static final int HOSPITAL_WIDTH = 2;
 
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	private int col, row;
 	private Polygon shape;
@@ -31,7 +33,7 @@ public class Hospital extends Building{
 	int zIndex;
 	
 	public Hospital(int row, int col) {
-		super(5000, 300);
+		super(300000, 300);
 		state = 0;
 		zIndex = 100 - col + row;
 		this.col = col;
@@ -41,6 +43,7 @@ public class Hospital extends Building{
 	}
 	
 	public void update() {
+
 		updateSelected();
 		if (City.time.getDay() == 1) {
 			payForFunctioning();
@@ -79,72 +82,6 @@ public class Hospital extends Building{
 		shape = new Polygon(vertices);
 	}
 	
-	@Override
-	public void setWaterBill(short waterBill) {
-		this.electricityBill = waterBill;
-	}
-
-	final byte doctorsLimit = 16;
-	final short monthlyPatientLimit = 800;
-	final float baseTreatmentBill = 0.25f;
-	final short serviceBill = 12000;
-	final short employeeSalary = 9200;
-
-	short curedPatients;
-
-	short treatmentBill;
-	int currentProfit;
-	short collectedMoney;
-
-	public boolean hireEmployee(Citizen employee) {
-		if (doctors.size() <= doctorsLimit) {
-			doctors.add(employee);
-
-			employee.salary = employeeSalary;
-			employee.isSalaryChanged = true;
-			employee.occupation = Citizen.Occupation.DOCTOR;
-		} else {
-			return false;
-		}
-
-		return true;
-	}
-
-	public int visitHospital(Citizen patient) {
-		if (curedPatients <= monthlyPatientLimit) {
-			calculateTreatmentBill(patient);
-			if (!(patient.moneySavings < treatmentBill)) {
-				return 0;
-			}
-
-			curedPatients++;
-
-			collectedMoney += treatmentBill;
-			return treatmentBill;
-		}
-
-		return 0;
-	}
-
-	public void payForFunctioning() {
-		currentProfit = collectedMoney - waterBill - electricityBill - serviceBill - doctors.size() * employeeSalary;
-		City.budget.changeBudget(currentProfit);
-
-		collectedMoney = 0;
-	}
-
-	public void calculateTreatmentBill(Citizen patient) {
-		treatmentBill = (short) Math.round((City.PRNG.nextFloat() * 0.15 + baseTreatmentBill) * patient.salary);
-
-		float[] seriousProblem = new float[2];
-		seriousProblem[0] = (float) 0.95;
-		seriousProblem[1] = (float) 0.05;
-
-		if (City.BPRNG.nextByte(seriousProblem, (short) 100) == 1) {
-			treatmentBill += (short) (City.PRNG.nextFloat() * 0.3 * patient.salary);
-		}
-	}
-	
 	public int getState() {
 		return state;
 	}
@@ -167,6 +104,10 @@ public class Hospital extends Building{
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
+		Hud.setInformationScreen(this, screenX, screenY);
 		System.out.println("It is a Hospital!!");
 	}
 
@@ -201,11 +142,7 @@ public class Hospital extends Building{
 	public void setPowered(boolean isPowered) {
 		this.isPowered = isPowered;
 	}
-	
-	@Override
-	public void setElectricityBill(short electricityBill) {
-		this.electricityBill = electricityBill;
-	}
+
 	
 	@Override
 	public int getHeight() {
@@ -216,5 +153,87 @@ public class Hospital extends Building{
 	public int getWidth() {
 		return HOSPITAL_WIDTH;
 	}
+	
+	@Override
+	public void setElectricityBill(int electricityBill) {
+		this.electricityBill = electricityBill;
+	}
 
+	@Override
+	public void setWaterBill(int waterBill) {
+		this.electricityBill = waterBill;
+	}
+
+	public final byte doctorsLimit = 16;
+	public final short monthlyPatientLimit = 800;
+	public final float baseTreatmentBill = 0.25f;
+	public final short serviceBill = 12000;
+	public final short employeeSalary = 9200;
+
+	public short curedPatients;
+
+	public short treatmentBill;
+	public int currentProfit;
+	public short collectedMoney;
+
+	public boolean hireEmployee(Citizen employee) {
+		if (doctors.size() <= doctorsLimit) {
+			doctors.add(employee);
+
+			employee.salary = employeeSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.DOCTOR;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public int visitHospital(Citizen patient) {
+		if (curedPatients <= monthlyPatientLimit) {
+			calculateTreatmentBill(patient);
+			if (!(patient.moneySavings < treatmentBill)) {
+				return 0;
+			}
+
+			curedPatients++;
+
+			collectedMoney += treatmentBill;
+			return treatmentBill;
+		}
+
+		return 0;
+	}
+
+	public void payForFunctioning() {
+		doctors.forEach(Citizen::getSalary);
+
+		currentProfit = collectedMoney - waterBill - electricityBill - serviceBill - doctors.size() * employeeSalary;
+		City.budget.changeBudget(currentProfit);
+
+		collectedMoney = 0;
+	}
+
+	public void calculateTreatmentBill(Citizen patient) {
+		treatmentBill = (short) Math.round((City.PRNG.nextFloat() * 0.15 + baseTreatmentBill) * patient.salary);
+
+		float[] seriousProblem = new float[2];
+		seriousProblem[0] = (float) 0.95;
+		seriousProblem[1] = (float) 0.05;
+
+		if (City.BPRNG.nextByte(seriousProblem, (short) 100) == 1) {
+			treatmentBill += (short) (City.PRNG.nextFloat() * 0.3 * patient.salary);
+		}
+	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
+	}
 }

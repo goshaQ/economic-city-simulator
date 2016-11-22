@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.itproject.game.Assets;
 import com.itproject.game.Citizen;
+import com.itproject.game.City;
 import com.itproject.game.Hud;
 
 public class OilPlant extends Building {
@@ -21,36 +22,41 @@ public class OilPlant extends Building {
 	public static final int OIL_PLANT_DESTROYED = 4;
 	public static final int OIL_PLANT_HEIGHT = 3;
 	public static final int OIL_PLANT_WIDTH = 3;
-	
+
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> lords; 
 	TiledMapTileLayer layer;
 	int zIndex;
-	
+
 	public OilPlant(int row, int col) {
-		super(10000, 500);
+		super(1000000, 500);
 		state = 0;
 		zIndex = 100 - col + row;
 		this.col = col;
 		this.row = row;
-		lords = new ArrayList<Citizen>(10); 
+		workers = new ArrayList<>(); // default 10 firefighters at start
+		volumeOfOilPerDay = 10;
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
+		capital = 80000;
 	}
 	
 	public void update() {
-		updateSelected();
+		produceResource();
+		if (City.time.getDay() == 1) {
+			calculateProfit();
+		}
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		this.electricityBill = electricityBill;
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		this.waterBill = waterBill;
 	}
 
@@ -116,6 +122,9 @@ public class OilPlant extends Building {
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 
 		System.out.println("It is a OIL_PLANT!!");
@@ -152,7 +161,7 @@ public class OilPlant extends Building {
 	public void setPowered(boolean isPowered) {
 		this.isPowered = isPowered;
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return OIL_PLANT_HEIGHT;
@@ -161,6 +170,122 @@ public class OilPlant extends Building {
 	@Override
 	public int getWidth() {
 		return OIL_PLANT_WIDTH;
+	}
+
+	public List<Citizen> workers;
+
+	public final short workersLimit = 120;
+	public final short serviceBill = 24000;
+	public final short workerSalary = 3800;
+	public final short basePriceForOil = 20;
+
+	public int expensesLastMonth;
+	public int currentProfit;
+	public int capital;
+	public int taxes;
+
+	public short volumeOfOil;
+	public short volumeOfOilPerDay;
+	public short priceForOil;
+
+	public boolean hireEmployee(Citizen employee) {
+		if (workers.size() < workersLimit) {
+			workers.add(employee);
+
+			employee.salary = workerSalary;
+			employee.isSalaryChanged = true;
+			employee.occupation = Citizen.Occupation.OILPLANTWORKER;
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void calculateProfit() {
+		calculatePriceForResource();
+		currentProfit = volumeOfOil * priceForOil;
+
+		City.budget.recalculateTax(this);
+		City.budget.changeBudget(taxes);
+
+		workers.forEach(Citizen::getSalary);
+
+		expensesLastMonth = taxes +
+				(electricityBill + waterBill + serviceBill + workers.size() * workerSalary);
+		capital += volumeOfOil * priceForOil - expensesLastMonth;
+
+		int desiredProfit = (int) Math.round(capital * 0.015);
+		int profitPerDay = (desiredProfit + expensesLastMonth) / City.time.days[City.time.getMonth() - 1];
+		volumeOfOilPerDay = (short) ((profitPerDay / priceForOil) / workers.size());
+
+		System.out.println("Desired volume of oil per day in next month: " + volumeOfOilPerDay);
+		System.out.println("Needed profit per day: " + profitPerDay);
+		System.out.println("Expenses could be: " + expensesLastMonth / City.time.days[City.time.getMonth() - 1]);
+
+		System.out.println("Oil Plant has payed taxes: " + taxes);
+		System.out.println("Number of workers in Oil Plant: " + workers.size());
+		System.out.println("Current capital of Oil Plant: " + capital);
+		System.out.println("Last month Oil Plant earned: " + currentProfit);
+		System.out.println("Price for one unit of oil last month was: " + priceForOil);
+		System.out.println("");
+
+		volumeOfOil = 0;
+	}
+
+	public void calculatePriceForResource() {
+		float[] priceProbability = new float[3];
+		priceProbability[0] = 0.7f;
+		priceProbability[1] = 0.15f;
+		priceProbability[2] = 0.15f;
+
+		switch (City.BPRNG.nextByte(priceProbability, (short) 100)) {
+			case 0:
+				priceForOil = (short) (City.PRNG.nextInt(10) + basePriceForOil);
+				break;
+			case 1:
+				priceForOil = (short) (City.PRNG.nextInt(10) + City.PRNG.nextInt(8) + basePriceForOil);
+				break;
+			case 2:
+				priceForOil = (short) (City.PRNG.nextInt(10) - City.PRNG.nextInt(8) + basePriceForOil);
+				break;
+		}
+	}
+
+	public void produceResource() {
+		float[] produceAmountProbability = new float[4];
+		produceAmountProbability[0] = 0.35f;
+		produceAmountProbability[1] = 0.15f;
+		produceAmountProbability[2] = 0.25f;
+		produceAmountProbability[3] = 0.25f;
+
+
+		for (Citizen worker : workers) {
+			volumeOfOil += volumeOfOilPerDay;
+			switch (City.BPRNG.nextByte(produceAmountProbability, (short) 100)) {
+				case 0:
+					volumeOfOil += volumeOfOilPerDay * 0.25f;
+					break;
+				case 1:
+					volumeOfOil -= volumeOfOilPerDay * 0.6f;
+					break;
+				case 2:
+					volumeOfOil += volumeOfOilPerDay * 0.4f;
+					break;
+				case 3:
+					volumeOfOil -= volumeOfOilPerDay * 0.15f;
+			}
+		}
+	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
 	}
 
 }

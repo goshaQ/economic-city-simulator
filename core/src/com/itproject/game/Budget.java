@@ -1,9 +1,6 @@
 package com.itproject.game;
 
-import com.itproject.game.buildings.Building;
-import com.itproject.game.buildings.PowerStation;
-import com.itproject.game.buildings.WaterStation;
-import com.itproject.game.buildings.WorldTradeCenter;
+import com.itproject.game.buildings.*;
 
 import java.util.HashMap;
 
@@ -74,14 +71,42 @@ public class Budget {
             for (short upper : progressiveTaxPercentage.keySet()) {
                 if (building instanceof WorldTradeCenter) {
                     if(((WorldTradeCenter) building).currentProfit < upper) {
-                        ((WorldTradeCenter) building).taxes = (short) Math.round(((WorldTradeCenter) building).currentProfit* progressiveTaxPercentage.get(upper) / 100);
+                        ((WorldTradeCenter) building).taxes = Math.round(((WorldTradeCenter) building).currentProfit* progressiveTaxPercentage.get(upper) / 100);
+                        break;
+                    }
+                } else if (building instanceof GroceryShop) {
+                    if(((GroceryShop) building).currentProfit < upper) {
+                        ((GroceryShop) building).taxes = Math.round(((GroceryShop) building).currentProfit* progressiveTaxPercentage.get(upper) / 100);
+                        break;
+                    }
+                } else if (building instanceof Bar) {
+                    if(((Bar) building).currentProfit < upper) {
+                        ((Bar) building).taxes = Math.round(((Bar) building).currentProfit* progressiveTaxPercentage.get(upper) / 100);
+                        break;
+                    }
+                } else if (building instanceof IronPlant) {
+                    if(((IronPlant) building).currentProfit < upper) {
+                        ((IronPlant) building).taxes = Math.round(((IronPlant) building).currentProfit* progressiveTaxPercentage.get(upper) / 100);
+                        break;
+                    }
+                } else if (building instanceof OilPlant) {
+                    if(((OilPlant) building).currentProfit < upper) {
+                        ((OilPlant) building).taxes = Math.round(((OilPlant) building).currentProfit* progressiveTaxPercentage.get(upper) / 100);
                         break;
                     }
                 }
             }
         } else {
             if (building instanceof WorldTradeCenter) {
-                ((WorldTradeCenter) building).taxes = (short) Math.round(((WorldTradeCenter) building).currentProfit* fixedTaxPercentage / 100);
+                ((WorldTradeCenter) building).taxes = Math.round(((WorldTradeCenter) building).currentProfit* fixedTaxPercentage / 100);
+            } else if (building instanceof GroceryShop) {
+                ((GroceryShop) building).taxes = Math.round(((GroceryShop) building).currentProfit* fixedTaxPercentage / 100);
+            } else if (building instanceof Bar) {
+                ((Bar) building).taxes = Math.round(((Bar) building).currentProfit* fixedTaxPercentage / 100);
+            } else if (building instanceof IronPlant) {
+                ((IronPlant) building).taxes = Math.round(((IronPlant) building).currentProfit* fixedTaxPercentage / 100);
+            } else if (building instanceof OilPlant) {
+                ((OilPlant) building).taxes = Math.round(((OilPlant) building).currentProfit* fixedTaxPercentage / 100);
             }
         }
     }

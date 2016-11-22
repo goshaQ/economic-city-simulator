@@ -25,13 +25,14 @@ public class Park extends Building {
 	int state;
 	private int col, row;
 	private Polygon shape;
-	List<Citizen> camper;
+	public List<Citizen> camper;
 	TiledMapTileLayer layer;
 	int zIndex;
 	boolean isPowered;
+	boolean isWatered;
 	
 	public Park(int row, int col) {
-		super(10000, 500);
+		super(300000, 500);
 		
 		state = 0;
 		zIndex = 100 - col + row;
@@ -47,12 +48,12 @@ public class Park extends Building {
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		//not used for park
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		//not used for park
 	}
 
@@ -116,6 +117,9 @@ public class Park extends Building {
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 
 		System.out.println("It is a Park!!");
@@ -162,6 +166,22 @@ public class Park extends Building {
 	public int getWidth() {
 		return PARK_WIDTH;
 	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
+	}
 	
+	public int numberOfVisits;
+
+	public void visitPark(Citizen citizen) {
+		citizen.happinessLevel++;
+		numberOfVisits++;
+	}
 	
 }

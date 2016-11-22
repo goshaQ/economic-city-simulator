@@ -24,6 +24,7 @@ public class FireStation extends Building {
 	public static final int FIRE_STATION_WIDTH = 2;
 	
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	private int col, row;
 	private Polygon shape;
@@ -52,12 +53,12 @@ public class FireStation extends Building {
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		this.electricityBill = electricityBill;
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		this.waterBill = waterBill;
 	}
 
@@ -117,6 +118,9 @@ public class FireStation extends Building {
 		// to implement
 		//Hud.stage.addActor(new BuildingInformationWindow());
 		//this.firefighters.add(new Citizen());
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 		System.out.println("It is a FIRESTATION!!");
 	}
@@ -168,6 +172,16 @@ public class FireStation extends Building {
 	@Override
 	public int getWidth() {
 		return FIRE_STATION_WIDTH;
+	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
 	}
 
 }

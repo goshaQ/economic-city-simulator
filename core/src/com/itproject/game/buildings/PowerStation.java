@@ -29,6 +29,7 @@ public class PowerStation extends Building{
 
 	TiledMapTileLayer.Cell[] cell;
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	private int col, row;
 	private Polygon shape;
@@ -37,7 +38,7 @@ public class PowerStation extends Building{
 	int zIndex;
 	
 	public PowerStation(int row, int col) {
-		super(10000, 500);
+		super(500000, 500);
 		
 		state = 0;
 		zIndex = 100 - col + row;
@@ -45,7 +46,7 @@ public class PowerStation extends Building{
 		this.col = col;
 		this.row = row;
 		cell = new TiledMapTileLayer.Cell[6];
-		employees = new ArrayList<Citizen>(10); // default 10 firefighters at start
+		employees = new ArrayList<Citizen>(10); 
 		layer = (TiledMapTileLayer)Assets.tiledMap.getLayers().get("mainLayer");
 		buildings = new ArrayList<Building>(POWER_CONSUMERS_LIMIT);
 		initializePowerConsumers();
@@ -58,12 +59,12 @@ public class PowerStation extends Building{
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		//not used for power station
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		//not used for power station
 	}
 
@@ -131,6 +132,9 @@ public class PowerStation extends Building{
 	
 	public void showInfo(float screenX, float screenY) {
 		// to implement
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 
 		System.out.println("It is a Power Station!!");
@@ -203,17 +207,17 @@ public class PowerStation extends Building{
 	}
 	
 
-	final byte buildingsLimit = 12;
-	final byte employeeLimitForBlock = 10;
-	final short employeeSalary = 4800;
-	final short monthlyExpenses = 10000;
-	final short dailyExpenses = 2000;
-	final short baseProfitRate = 800;
+	public final byte buildingsLimit = 12;
+	public final byte employeeLimitForBlock = 10;
+	public final short employeeSalary = 4800;
+	public final short monthlyExpenses = 12000;
+	public final short dailyExpenses = 1200;
+	public final short baseProfitRate = 1200;
 
 	public int currentProfit;
 	public short taxes;
 
-	List<Building> buildings;
+	public List<Building> buildings;
 	public List<Citizen> employees;
 
 	public boolean attachBuilding(Building building) {
@@ -244,19 +248,37 @@ public class PowerStation extends Building{
 	}
 
 	public void calculateBIll() {
-		short electricityBill;
-
-		calculateMarkup();
-		electricityBill = (short) Math.round((City.time.days[City.time.getMonth() - 1] * dailyExpenses + monthlyExpenses
-				+ employees.size() * employeeSalary + currentProfit) / buildings.size());
-
-		City.budget.changeBudget(currentProfit);
-
-		employees.forEach(employee -> employee.getSalary());
-		buildings.forEach(building -> building.setElectricityBill(electricityBill));
+		int electricityBill;
+		if(buildings.size() > 0) {
+			calculateMarkup();
+			electricityBill = Math.round((City.time.days[City.time.getMonth() - 1] * dailyExpenses + monthlyExpenses
+					+ employees.size() * employeeSalary + currentProfit) / buildings.size());
+	
+			System.out.println("Power station calculated electricity bill: " + electricityBill);
+			System.out.println("Daily expenses: " + City.time.days[City.time.getMonth() - 1] * dailyExpenses);
+			System.out.println("Monthly expenses: " + monthlyExpenses);
+			System.out.println("Employee salary: " + employees.size() * employeeSalary);
+			System.out.println("Profit: " + currentProfit);
+			System.out.println("");
+	
+			City.budget.changeBudget(currentProfit);
+	
+			employees.forEach(employee -> employee.getSalary());
+			buildings.forEach(building -> building.setElectricityBill(electricityBill));
+		}
 	}
 
 	private void calculateMarkup() {
 		currentProfit = (short) ((City.PRNG.nextInt(400) + baseProfitRate) * buildings.size());
+	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
 	}
 }

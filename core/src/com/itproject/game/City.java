@@ -1,13 +1,6 @@
 package com.itproject.game;
 
-import com.itproject.game.buildings.Bank;
-import com.itproject.game.buildings.Building;
-import com.itproject.game.buildings.Hospital;
-import com.itproject.game.buildings.House;
-import com.itproject.game.buildings.PowerStation;
-import com.itproject.game.buildings.WaterStation;
-import com.itproject.game.buildings.WorldTradeCenter;
-
+import com.itproject.game.buildings.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,15 +35,19 @@ public class City {
 	static float[] deathStatistics = new float[117];
 	static float[] expensesStatistics = new float[4];
 
+	public static float[] jobDistribution = new float[10];
+
 	CityListener listener;
 	public static List<Citizen> citizens;
 	public static List<Building> buildings;
 	List<Road> road;
 
-	Worldview worldview;
+	public static Worldview worldview;
+	public static int deathCounter;
+	public static int birthCounter;
 	public static Budget budget;
-
 	int state;
+	public static float averageHappynessLevel;
 
 	public City(CityListener listener) {
 		loadStatistics();
@@ -64,10 +61,11 @@ public class City {
 		this.worldview = new Worldview(this);
 		this.budget = new Budget(this);
 		this.time = new Time();
-
+		budget.makeProgressive();
 		//lul
 		this.time.nextDay();
 
+		deathCounter = birthCounter = 0;
 		// Create map generation later
 		// generateMap();
 
@@ -76,7 +74,7 @@ public class City {
 		citizens.add(new Citizen(Worldview.WorldviewType.WORLDVIEW2, new Interval((byte) 0, (byte)0, (byte)18), (short) 3600));
 		citizens.add(new Citizen(Worldview.WorldviewType.WORLDVIEW3, new Interval((byte) 0, (byte)0, (byte)18), (short) 3600));
 
-		for (int i = 0; i < 97; i++) {
+		for (int i = 0; i < 297; i++) {
 			citizens.add(new Citizen(worldview.determineType(), new Interval((byte) 0, (byte)0, (byte)18), (short) 3600));
 		}
 	}
@@ -88,6 +86,7 @@ public class City {
 	public void update(float deltaTime) {
 		gameTime += deltaTime;
 		if (gameTime >= 1f) {
+			updateBuildings();
 
             updateCitizens();
 			updatePopulation();
@@ -95,8 +94,12 @@ public class City {
             findHouse();
             findJob();
 
-			updateBuildings();
+            if (time.getDay() == 1) {
+            	deathCounter = birthCounter = 0;
+            }
+            
 			updateTime();
+			System.out.println("Citizen population: " + citizens.size());
 
             gameTime -= 1f;
 		}
@@ -195,6 +198,7 @@ public class City {
 							secondParent.moneySavings = 0;
 						}
 
+						birthCounter++;
 						newCitizens.add(new Citizen(worldview.determineType(), moneyForChild));
 					} else {
 						if (firstParent.moneySavings - 2400 >= 0) {
@@ -212,7 +216,9 @@ public class City {
 							moneyForChild += (short) (secondParent.moneySavings >> 1);
 							secondParent.moneySavings = 0;
 						}
-
+						
+						birthCounter++;
+						birthCounter++;
 						newCitizens.add(new Citizen(worldview.determineType(), moneyForChild));
 						newCitizens.add(new Citizen(worldview.determineType(), moneyForChild));
 					}
@@ -236,6 +242,11 @@ public class City {
     }
 
 	private void updateCitizens() {
+		for (int i = 0; i < jobDistribution.length; i++) {
+			jobDistribution[i] = 0;
+		}
+		averageHappynessLevel = 0;
+
         List<Citizen> deadCitizens = new ArrayList<>();
 
 		int previousYear;
@@ -243,8 +254,44 @@ public class City {
 			previousYear = c.age.getYear();
 			c.update();
 
-			if (c.age.getYear() > previousYear || (c.age.getYear() == 0 && c.age.getMonth() == 0 && c.age.getDay() == 7)) {
+			averageHappynessLevel += c.happinessLevel;
+
+			switch (c.occupation) {
+				case IRONPLANTWORKER:
+					jobDistribution[0]++;
+					break;
+				case OILPLANTWORKER:
+					jobDistribution[1]++;
+					break;
+				case TRADER:
+					jobDistribution[2]++;
+					break;
+				case SELLER:
+					jobDistribution[3]++;
+					break;
+				case BANKER:
+					jobDistribution[4]++;
+					break;
+				case CLERK:
+					jobDistribution[5]++;
+					break;
+				case DOCTOR:
+					jobDistribution[6]++;
+					break;
+				case WATERSTATIONWORKER:
+					jobDistribution[7]++;
+					break;
+				case POWERSTATIONWORKER:
+					jobDistribution[8]++;
+					break;
+				case UNEMPLOYED:
+					jobDistribution[9]++;
+					break;
+			}
+
+			if (c.age.getYear() > previousYear || (c.age.getYear() == 0 && c.age.getMonth() == 0 && c.age.getDay() == 7) || c.biasedDeathProbability >= 1) {
                 if(!c.isAlive()) {
+                	deathCounter++;
 					deadCitizens.add(c);
                 }
             }
@@ -264,10 +311,37 @@ public class City {
 				} else if (building instanceof WorldTradeCenter) {
 					((WorldTradeCenter) building).salespeople.removeAll(deadCitizens);
 					((WorldTradeCenter) building).traders.removeAll(deadCitizens);
+				} else if (building instanceof GroceryShop) {
+					((GroceryShop) building).salespeople.removeAll(deadCitizens);
+				} else if (building instanceof IronPlant) {
+					((IronPlant) building).workers.removeAll(deadCitizens);
+				} else if (building instanceof OilPlant) {
+					((OilPlant) building).workers.removeAll(deadCitizens);
+				} else if (building instanceof House) {
+					((House) building).residents.removeAll(deadCitizens);
 				}
 			}
 			citizens.removeAll(deadCitizens);
 		}
+
+		for (int i = 0; i < jobDistribution.length; i++) {
+			jobDistribution[i] = jobDistribution[i] / citizens.size();
+		}
+		averageHappynessLevel = averageHappynessLevel / citizens.size();
+
+		System.out.println("IRONPLANTWORKER: " + jobDistribution[0]);
+		System.out.println("OILPLANTWORKER: " + jobDistribution[1]);
+		System.out.println("TRADER: " + jobDistribution[2]);
+		System.out.println("SELLER: " + jobDistribution[3]);
+		System.out.println("BANKER: " + jobDistribution[4]);
+		System.out.println("CLERK: " + jobDistribution[5]);
+		System.out.println("DOCTOR: " + jobDistribution[6]);
+		System.out.println("WATERSTATIONWORKER: " + jobDistribution[7]);
+		System.out.println("POWERSTATIONWORKER: " + jobDistribution[8]);
+		System.out.println("UNEMPLOYED: " + jobDistribution[9]);
+		System.out.println("");
+		System.out.println("Average happiness level: " + averageHappynessLevel);
+		System.out.println("");
 	}
 
 	public void findJob() {
@@ -286,7 +360,27 @@ public class City {
                             if (((WaterStation) building).hireEmployee(citizen)) {
                                 break;
                             }
-                        } else if (building instanceof Hospital) {
+                        } else if (building instanceof WorldTradeCenter) {
+							if (((WorldTradeCenter) building).hireEmployee(citizen)) {
+								break;
+							}
+						} else if (building instanceof GroceryShop) {
+							if (((GroceryShop) building).hireEmployee(citizen)) {
+								break;
+							}
+						} else if (building instanceof Bar) {
+							if (((Bar) building).hireEmployee(citizen)) {
+								break;
+							}
+						} else if (building instanceof IronPlant) {
+							if (((IronPlant) building).hireEmployee(citizen)) {
+								break;
+							}
+						} else if (building instanceof OilPlant) {
+							if (((OilPlant) building).hireEmployee(citizen)) {
+								break;
+							}
+						} else if (building instanceof Hospital) {
                             if (((Hospital) building).hireEmployee(citizen)) {
                                 break;
                             }
@@ -312,7 +406,7 @@ public class City {
         }
     }
 
-	public void findHouse() {
+	public void findHouse() 	{
         boolean isSettled;
 
         Iterator<Building> iterator = buildings.iterator();

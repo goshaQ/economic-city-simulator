@@ -25,17 +25,18 @@ public class House extends Building {
 	public static final int HOUSE_WIDTH = 2;
 
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	private int col, row;
 	private Polygon shape;
 	private Polygon collisionShape;
-	List<Citizen> residents;
+	public List<Citizen> residents;
 	TiledMapTileLayer layer;
 	int zIndex;
 	//final byte residentsLimit = 75;
-	
+
 	public House(int row, int col) {
-		super(1000, 100);
+		super(30000, 100);
 		this.col = col;
 		this.row = row;
 		
@@ -97,73 +98,6 @@ public class House extends Building {
 	    shape = new Polygon(vertices);
 	}
 	
-	final short serviceBill = 16000;
-	final short baseProfitRate = 100;
-	final byte residentsLimit = 75;
-
-	boolean isUtilityBillUpdated;
-	short collectedMoney;
-	public short utilityBill;
-	short currentProfit;
-
-	@Override
-	public void setElectricityBill(short electricityBill) {
-		this.electricityBill = electricityBill;
-	}
-
-	@Override
-	public void setWaterBill(short waterBill) {
-		this.waterBill = waterBill;
-	}
-
-	public void calculateUtilityBill() {
-		if(!residents.isEmpty()) {
-			calculateMarkup();
-			utilityBill = (short) ((electricityBill + waterBill + serviceBill + currentProfit) / residents.size());
-
-			isUtilityBillUpdated = true;
-		}
-	}
-
-	public short payUtility(Citizen resident) {
-		if (!isUtilityBillUpdated) {
-			calculateUtilityBill();
-		}
-
-		if (resident.moneySavings - utilityBill >= 0) {
-			collectedMoney += utilityBill;
-			return utilityBill;
-		} else {
-			return 0;
-		}
-	}
-
-	public boolean settleResident(Citizen resident) {
-		if (residents.size() < residentsLimit) {
-			resident.house = this;
-			residents.add(resident);
-		} else {
-			return false;
-		}
-
-		return true;
-	}
-
-	public void moveOut(Citizen resident) {
-		residents.remove(resident);
-	}
-
-	public void payProviderOfPowerAndWater() {
-		if (collectedMoney - serviceBill >= electricityBill + waterBill) {
-			City.budget.changeBudget(currentProfit);
-		} else {
-			City.budget.changeBudget(-(electricityBill + waterBill + serviceBill - collectedMoney));
-		}
-	}
-
-	private void calculateMarkup() {
-		currentProfit = (short) ((City.PRNG.nextInt(120) + baseProfitRate) * residents.size());
-	}
 	
 	public Polygon getCollisionShape() {
 		return collisionShape;
@@ -185,6 +119,9 @@ public class House extends Building {
 
 	
 	public void showInfo(float screenX, float screenY) {
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 		System.out.println("It is a house!");
 	}
@@ -222,6 +159,83 @@ public class House extends Building {
 	@Override
 	public int getWidth() {
 		return HOUSE_WIDTH;
+	}
+
+	final short serviceBill = 8000;
+	final short baseProfitRate = 100;
+	final byte residentsLimit = 75;
+
+	boolean isUtilityBillUpdated;
+	short collectedMoney;
+	public short utilityBill;
+	public short currentProfit;
+
+	@Override
+	public void setElectricityBill(int electricityBill) {
+		this.electricityBill = electricityBill;
+	}
+
+	@Override
+	public void setWaterBill(int waterBill) {
+		this.waterBill = waterBill;
+	}
+
+	public void calculateUtilityBill() {
+		if (!residents.isEmpty()) {
+			calculateMarkup();
+			utilityBill = (short) ((electricityBill + waterBill + serviceBill + currentProfit) / residentsLimit);
+
+			System.out.println("Utility bill for house: " + utilityBill);
+
+			isUtilityBillUpdated = true;
+		}
+	}
+
+	public short payUtility(Citizen resident) {
+		if (!isUtilityBillUpdated) {
+			calculateUtilityBill();
+		}
+
+		if (resident.moneySavings - utilityBill >= 0) {
+			collectedMoney += utilityBill;
+			return utilityBill;
+		} else {
+			return 0;
+		}
+	}
+
+	public boolean settleResident(Citizen resident) {
+		if (residents.size() < residentsLimit) {
+			resident.house = this;
+			residents.add(resident);
+		} else {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void moveOut(Citizen resident) {
+		residents.remove(resident);
+	}
+
+	public void payProviderOfPowerAndWater() {
+		collectedMoney -= serviceBill + electricityBill + waterBill;
+		City.budget.changeBudget(collectedMoney);
+	}
+
+	private void calculateMarkup() {
+		currentProfit = (short) ((City.PRNG.nextInt(120) + baseProfitRate) * residents.size());
+	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
 	}
 
 }

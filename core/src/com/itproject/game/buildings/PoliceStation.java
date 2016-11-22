@@ -23,6 +23,7 @@ public class PoliceStation extends Building{
 	public static final int POLICE_STATION_WIDTH = 2;
 
 	boolean isPowered;
+	boolean isWatered;
 	int state;
 	private int col, row;
 	private Polygon shape;
@@ -45,12 +46,12 @@ public class PoliceStation extends Building{
 	}
 
 	@Override
-	public void setElectricityBill(short electricityBill) {
+	public void setElectricityBill(int electricityBill) {
 		this.electricityBill = electricityBill;
 	}
 
 	@Override
-	public void setWaterBill(short waterBill) {
+	public void setWaterBill(int waterBill) {
 		this.waterBill = waterBill;
 	}
 
@@ -69,7 +70,7 @@ public class PoliceStation extends Building{
 			state = POLICE_STATION_OK;
 		}
 	}
-	
+
 	public void createShape() {
 		int screenx = (col + row + 1) * TILE_WIDTH / 2 - 32;
 	    int screeny = (col - row + 1) * TILE_HEIGHT / 2;
@@ -118,6 +119,9 @@ public class PoliceStation extends Building{
 	@Override
 	public void showInfo(float screenX, float screenY) {
 		// TODO Auto-generated method stub
+		if(Hud.infoActor != null) {
+    		Hud.infoActor.remove();
+    	}
 		Hud.setInformationScreen(this, screenX, screenY);
 
 	}
@@ -151,6 +155,16 @@ public class PoliceStation extends Building{
 	@Override
 	public int getWidth() {
 		return POLICE_STATION_WIDTH;
+	}
+
+	@Override
+	public boolean isWatered() {
+		return isWatered;
+	}
+
+	@Override
+	public void setWatered(boolean isWatered) {
+		this.isWatered = isWatered;
 	}
 
 }
